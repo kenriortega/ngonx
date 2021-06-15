@@ -13,6 +13,7 @@ type EndpointService struct {
 }
 
 func main() {
+	// TODO: migrate to yaml | json | key/value service
 	endpoints := []EndpointService{
 		{
 			HostURI: "http://localhost:8000/api/v1/health/",
