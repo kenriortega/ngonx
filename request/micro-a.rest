@@ -1,0 +1,15 @@
+### Micro A
+
+GET http://localhost:8000/api/v1/health/
+
+###
+
+GET http://localhost:8000/api/v1/version/
+
+
+### Gateway Proxy
+
+GET http://localhost:8080/version/
+###
+
+GET http://localhost:8080/health/
