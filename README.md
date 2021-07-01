@@ -1,5 +1,5 @@
 # egosystem
-Roadmap for micro services developers
+PoC for learning how work proxy and load balancer like nginx server
 
 
 ## Load Balancer command
