@@ -8,36 +8,46 @@ import (
 	"time"
 
 	domain "egosystem.org/micros/gateway/domain"
-	handler "egosystem.org/micros/gateway/handlers"
+	handlers "egosystem.org/micros/gateway/handlers"
+	"egosystem.org/micros/internal"
 )
 
-func Start() {
-	var port int
-	flag.IntVar(&port, "port", 8081, "Port to serve")
-	flag.Parse()
-	// TODO: migrate to yaml | json | key/value service
-	endpoints := []domain.EndpointService{
-		{
-			HostURI: "http://localhost:8000/api/v1/health/",
-			Path:    "/health/",
-		},
-		{
-			HostURI: "http://localhost:8000/api/v1/version/",
-			Path:    "/version/",
-		},
+var (
+	config    internal.Config
+	errConfig error
+	endpoints []domain.EndpointService
+	port      int
+	host      string
+)
+
+func init() {
+	config, errConfig = internal.LoadConfig(".", "proxy.yaml")
+	if errConfig != nil {
+		log.Println(errConfig)
 	}
+	endpoints = config.ProxyGateway.EnpointsProxy[0].Services
+	port = config.ProxyGateway.Port
+	host = config.ProxyGateway.Host
+}
+
+func Start() {
+	flag.IntVar(&port, "port", port, "Port to serve")
+	flag.Parse()
 
 	for _, endpoint := range endpoints {
-		handler.ProxyGateway(endpoint)
+		handlers.ProxyGateway(endpoint)
 	}
 
-	srv := &http.Server{
+	server := &http.Server{
 		Handler: nil,
-		Addr:    fmt.Sprintf("0.0.0.0:%d", port),
+		Addr:    fmt.Sprintf("%s:%d", host, port),
 		// Good practice: enforce timeouts for servers you create!
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
 
-	log.Fatal(srv.ListenAndServe())
+	log.Printf("Load Balancer started at :%d\n", port)
+	if err := server.ListenAndServe(); err != nil {
+		log.Fatal(err)
+	}
 }

@@ -3,5 +3,5 @@ package main
 import "egosystem.org/micros/cmd/proxy"
 
 func main() {
-	proxy.StartLB()
+	proxy.Start()
 }

@@ -12,8 +12,8 @@ import (
 
 // EndpointService ...
 type EndpointService struct {
-	HostURI string `json:"host_url"`
-	Path    string `json:"path"`
+	HostURI string `mapstructure:"host_uri"`
+	Path    string `mapstructure:"path_to_map"`
 }
 
 // Load Balancer data structures...
