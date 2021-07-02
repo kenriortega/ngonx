@@ -5,7 +5,7 @@ import (
 	badger "github.com/dgraph-io/badger/v3"
 )
 
-func getDB(embedMem bool) *badger.DB {
+func GetBadgerDB(embedMem bool) *badger.DB {
 	var opt badger.Options
 	if embedMem {
 		opt = badger.DefaultOptions("").WithInMemory(true)

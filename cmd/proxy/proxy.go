@@ -37,8 +37,9 @@ func Start() {
 	flag.BoolVar(&generateApiKey, "genkey", generateApiKey, "Action for generate hash")
 	flag.Parse()
 
-	var proxyRepository domain.ProxyRepositoryStorage
-	proxyRepository = domain.NewMtssRepository()
+	var proxyRepository domain.ProxyRepository
+	clientBadger := GetBadgerDB(true)
+	proxyRepository = domain.NewProxyRepository(clientBadger)
 	h := handlers.ProxyHandler{
 		Service: services.NewProxyService(proxyRepository),
 	}

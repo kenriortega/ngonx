@@ -8,21 +8,22 @@ import (
 	badger "github.com/dgraph-io/badger/v3"
 )
 
-type ProxyRepositoryStorage struct {
+type ProxyRepositoryDB struct {
 	clientBadger *badger.DB
 }
 
-func NewMtssRepository(clients ...interface{}) ProxyRepositoryStorage {
-	var proxyRepository ProxyRepositoryStorage
+func NewProxyRepository(clients ...interface{}) ProxyRepositoryDB {
+	var proxyRepositoryDB ProxyRepositoryDB
 	for _, c := range clients {
 		switch c.(type) {
 		case *badger.DB:
-			proxyRepository.clientBadger = c.(*badger.DB)
+			proxyRepositoryDB.clientBadger = c.(*badger.DB)
+		}
 	}
-	return proxyRepository
+	return proxyRepositoryDB
 }
 
-func (r ProxyRepositoryStorage) SaveSecretKEY(engine, apikey string) (err error) {
+func (r ProxyRepositoryDB) SaveKEY(engine, apikey string) error {
 	switch engine {
 	case "badger":
 		err := r.clientBadger.Update(func(txn *badger.Txn) error {
