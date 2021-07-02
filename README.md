@@ -19,3 +19,7 @@ go build
 ```bash
 go run  services/micro-a/api.go --port <port>
 ```
+
+```bash
+CGO_ENABLED=0 go get github.com/dgraph-io/badger/v3
+```

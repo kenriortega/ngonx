@@ -10,19 +10,6 @@ import (
 	"time"
 )
 
-// EndpointService ...
-type EndpointService struct {
-	Name      string     `mapstructure:"name"`
-	HostURI   string     `mapstructure:"host_uri"`
-	Endpoints []Endpoint `mapstructure:"endpoints"`
-}
-
-type Endpoint struct {
-	PathEndpoint  string `mapstructure:"path_endpoints"`
-	PathToProxy   string `mapstructure:"path_proxy"`
-	PathProtected string `mapstructure:"path_protected"`
-}
-
 // Load Balancer data structures...
 type AttemptsOrRetry int
 

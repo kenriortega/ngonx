@@ -1,0 +1,18 @@
+package gateway
+
+// EndpointService ...
+type ProxyEndpoint struct {
+	Name      string     `mapstructure:"name"`
+	HostURI   string     `mapstructure:"host_uri"`
+	Endpoints []Endpoint `mapstructure:"endpoints"`
+}
+
+type Endpoint struct {
+	PathEndpoint  string `mapstructure:"path_endpoints"`
+	PathToProxy   string `mapstructure:"path_proxy"`
+	PathProtected string `mapstructure:"path_protected"`
+}
+
+type ProxyRepository interface {
+	SaveSecretKEY(string, string) (string, error)
+}

@@ -1,4 +1,4 @@
-package internal
+package proxy
 
 import (
 	domain "egosystem.org/micros/gateway/domain"
@@ -10,9 +10,9 @@ type Config struct {
 }
 
 type ProxyGateway struct {
-	Host          string                   `mapstructure:"host_proxy"`
-	Port          int                      `mapstructure:"port_proxy"`
-	EnpointsProxy []domain.EndpointService `mapstructure:"services_proxy"`
+	Host          string                 `mapstructure:"host_proxy"`
+	Port          int                    `mapstructure:"port_proxy"`
+	EnpointsProxy []domain.ProxyEndpoint `mapstructure:"services_proxy"`
 }
 
 func LoadConfig(path, name string) (config Config, err error) {

@@ -8,9 +8,23 @@ import (
 	"net/url"
 
 	domain "egosystem.org/micros/gateway/domain"
+	services "egosystem.org/micros/gateway/services"
+	"egosystem.org/micros/internal"
 )
 
-func ProxyGateway(endpoints domain.EndpointService) {
+type ProxyHandler struct {
+	Service services.DefaultProxyService
+}
+
+func (ph *ProxyHandler) SaveSecretKEY(engine, apikey string) {
+	result, err := ph.Service.SaveSecretKEY(engine, apikey)
+	if err != nil {
+		fmt.Println(result)
+	}
+	fmt.Println(result)
+}
+
+func ProxyGateway(endpoints domain.ProxyEndpoint) {
 	for _, endpoint := range endpoints.Endpoints {
 
 		target, err := url.Parse(
@@ -37,6 +51,13 @@ func ProxyGateway(endpoints domain.EndpointService) {
 		)
 	}
 
+}
+
+// GetNameRandom get string names
+func GenRandomKEY(length int) string {
+	word := internal.StringWithCharset(length, internal.CHARSET)
+	apiKey := internal.ApiKeyGenerator(word)
+	return apiKey
 }
 
 func modifyRequest(req *http.Request) {
