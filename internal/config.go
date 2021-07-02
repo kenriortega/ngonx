@@ -10,13 +10,9 @@ type Config struct {
 }
 
 type ProxyGateway struct {
-	Host          string          `mapstructure:"host_proxy"`
-	Port          int             `mapstructure:"port_proxy"`
-	EnpointsProxy []EnpointsProxy `mapstructure:"enpoints_proxy"`
-}
-type EnpointsProxy struct {
-	Name     string                   `mapstructure:"name"`
-	Services []domain.EndpointService `mapstructure:"services"`
+	Host          string                   `mapstructure:"host_proxy"`
+	Port          int                      `mapstructure:"port_proxy"`
+	EnpointsProxy []domain.EndpointService `mapstructure:"services_proxy"`
 }
 
 func LoadConfig(path, name string) (config Config, err error) {

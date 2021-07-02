@@ -12,8 +12,15 @@ import (
 
 // EndpointService ...
 type EndpointService struct {
-	HostURI string `mapstructure:"host_uri"`
-	Path    string `mapstructure:"path_to_map"`
+	Name      string     `mapstructure:"name"`
+	HostURI   string     `mapstructure:"host_uri"`
+	Endpoints []Endpoint `mapstructure:"endpoints"`
+}
+
+type Endpoint struct {
+	PathEndpoint  string `mapstructure:"path_endpoints"`
+	PathToProxy   string `mapstructure:"path_proxy"`
+	PathProtected string `mapstructure:"path_protected"`
 }
 
 // Load Balancer data structures...

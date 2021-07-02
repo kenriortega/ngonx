@@ -9,6 +9,7 @@ import (
 
 	domain "egosystem.org/micros/gateway/domain"
 	handlers "egosystem.org/micros/gateway/handlers"
+
 	"egosystem.org/micros/internal"
 )
 
@@ -25,7 +26,7 @@ func init() {
 	if errConfig != nil {
 		log.Println(errConfig)
 	}
-	endpoints = config.ProxyGateway.EnpointsProxy[0].Services
+	endpoints = config.ProxyGateway.EnpointsProxy
 	port = config.ProxyGateway.Port
 	host = config.ProxyGateway.Host
 }
@@ -34,8 +35,9 @@ func Start() {
 	flag.IntVar(&port, "port", port, "Port to serve")
 	flag.Parse()
 
-	for _, endpoint := range endpoints {
-		handlers.ProxyGateway(endpoint)
+	for _, endpoints := range endpoints {
+
+		handlers.ProxyGateway(endpoints)
 	}
 
 	server := &http.Server{
@@ -46,7 +48,7 @@ func Start() {
 		ReadTimeout:  15 * time.Second,
 	}
 
-	log.Printf("Load Balancer started at :%d\n", port)
+	log.Printf("Proxy started at :%d\n", port)
 	if err := server.ListenAndServe(); err != nil {
 		log.Fatal(err)
 	}
