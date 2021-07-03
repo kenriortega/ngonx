@@ -1,11 +1,12 @@
-package gateway
+package proxy
 
 import (
-	domain "egosystem.org/micros/gateway/domain"
+	domain "egosystem.org/micros/proxy/domain"
 )
 
 type ProxyService interface {
 	SaveSecretKEY(string, string, string) error
+	GetKEY(string) (string, error)
 }
 
 type DefaultProxyService struct {
@@ -23,4 +24,12 @@ func (s DefaultProxyService) SaveSecretKEY(engine, key, apikey string) (string, 
 		return "failed", err
 	}
 	return "ok", nil
+}
+
+func (s DefaultProxyService) GetKEY(key string) (string, error) {
+	result, err := s.repo.GetKEY(key)
+	if err != nil {
+		return "failed", err
+	}
+	return result, nil
 }

@@ -1,4 +1,4 @@
-package gateway
+package proxy
 
 // EndpointService ...
 type ProxyEndpoint struct {

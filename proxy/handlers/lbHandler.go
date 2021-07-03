@@ -1,11 +1,11 @@
-package gateway
+package proxy
 
 import (
 	"log"
 	"net/http"
 	"time"
 
-	domain "egosystem.org/micros/gateway/domain"
+	domain "egosystem.org/micros/proxy/domain"
 )
 
 var ServerPool domain.ServerPool

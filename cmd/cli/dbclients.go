@@ -1,4 +1,4 @@
-package proxy
+package cli
 
 import (
 	"egosystem.org/micros/internal"

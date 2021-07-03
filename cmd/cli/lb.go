@@ -1,4 +1,4 @@
-package proxy
+package cli
 
 import (
 	"context"
@@ -11,9 +11,9 @@ import (
 	"strings"
 	"time"
 
-	domain "egosystem.org/micros/gateway/domain"
+	domain "egosystem.org/micros/proxy/domain"
 
-	handlers "egosystem.org/micros/gateway/handlers"
+	handlers "egosystem.org/micros/proxy/handlers"
 )
 
 func StartLB() {

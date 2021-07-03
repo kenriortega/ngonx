@@ -1,4 +1,4 @@
-package gateway
+package proxy
 
 import (
 	"fmt"
@@ -7,8 +7,9 @@ import (
 	"net/http/httputil"
 	"net/url"
 
-	domain "egosystem.org/micros/gateway/domain"
-	services "egosystem.org/micros/gateway/services"
+	"egosystem.org/micros/internal"
+	domain "egosystem.org/micros/proxy/domain"
+	services "egosystem.org/micros/proxy/services"
 )
 
 type ProxyHandler struct {
@@ -38,7 +39,11 @@ func (ph *ProxyHandler) ProxyGateway(endpoints domain.ProxyEndpoint) {
 		originalDirector := proxy.Director
 		proxy.Director = func(req *http.Request) {
 			originalDirector(req)
-			fmt.Println(req)
+			secretKey, err := ph.Service.GetKEY("secretKey")
+			if err != nil {
+				internal.LogError("getKey: failed " + err.Error())
+			}
+			fmt.Println(secretKey)
 			modifyRequest(req)
 		}
 		http.Handle(

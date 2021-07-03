@@ -1,7 +1,7 @@
-package proxy
+package cli
 
 import (
-	domain "egosystem.org/micros/gateway/domain"
+	domain "egosystem.org/micros/proxy/domain"
 	"github.com/spf13/viper"
 )
 

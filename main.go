@@ -1,7 +1,7 @@
 package main
 
-import "egosystem.org/micros/cmd/proxy"
+import "egosystem.org/micros/cmd/cli"
 
 func main() {
-	proxy.Start()
+	cli.Start()
 }

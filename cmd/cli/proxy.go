@@ -1,4 +1,4 @@
-package proxy
+package cli
 
 import (
 	"flag"
@@ -7,10 +7,10 @@ import (
 	"net/http"
 	"time"
 
-	domain "egosystem.org/micros/gateway/domain"
-	handlers "egosystem.org/micros/gateway/handlers"
-	services "egosystem.org/micros/gateway/services"
 	"egosystem.org/micros/internal"
+	domain "egosystem.org/micros/proxy/domain"
+	handlers "egosystem.org/micros/proxy/handlers"
+	services "egosystem.org/micros/proxy/services"
 )
 
 var (
@@ -39,7 +39,7 @@ func Start() {
 	flag.Parse()
 
 	var proxyRepository domain.ProxyRepository
-	clientBadger := GetBadgerDB(true)
+	clientBadger := GetBadgerDB(false)
 	proxyRepository = domain.NewProxyRepository(clientBadger)
 	h := handlers.ProxyHandler{
 		Service: services.NewProxyService(proxyRepository),
