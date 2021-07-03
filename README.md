@@ -1,4 +1,4 @@
-# egosystem
+# GOproxy
 PoC for learning how work proxy and load balancer like nginx server
 
 
