@@ -48,7 +48,7 @@ func Start() {
 	if generateApiKey {
 		word := internal.StringWithCharset()
 		apiKey := internal.ApiKeyGenerator(word)
-		_, err := h.Service.SaveSecretKEY("badger", apiKey)
+		_, err := h.Service.SaveSecretKEY("badger", "secretKey", apiKey)
 		if err != nil {
 			internal.LogError("genkey: Failed " + err.Error())
 		}

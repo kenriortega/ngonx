@@ -5,7 +5,7 @@ import (
 )
 
 type ProxyService interface {
-	SaveSecretKEY(string, string) error
+	SaveSecretKEY(string, string, string) error
 }
 
 type DefaultProxyService struct {
@@ -16,9 +16,9 @@ func NewProxyService(repository domain.ProxyRepository) DefaultProxyService {
 	return DefaultProxyService{repo: repository}
 }
 
-func (s DefaultProxyService) SaveSecretKEY(engine, apikey string) (string, error) {
+func (s DefaultProxyService) SaveSecretKEY(engine, key, apikey string) (string, error) {
 
-	err := s.repo.SaveKEY(engine, apikey)
+	err := s.repo.SaveKEY(engine, key, apikey)
 	if err != nil {
 		return "failed", err
 	}

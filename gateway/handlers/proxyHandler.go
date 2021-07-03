@@ -15,8 +15,8 @@ type ProxyHandler struct {
 	Service services.DefaultProxyService
 }
 
-func (ph *ProxyHandler) SaveSecretKEY(engine, apikey string) {
-	result, err := ph.Service.SaveSecretKEY(engine, apikey)
+func (ph *ProxyHandler) SaveSecretKEY(engine, key, apikey string) {
+	result, err := ph.Service.SaveSecretKEY(engine, key, apikey)
 	if err != nil {
 		fmt.Println(result)
 	}
