@@ -10,6 +10,7 @@ import (
 	domain "egosystem.org/micros/gateway/domain"
 	handlers "egosystem.org/micros/gateway/handlers"
 	services "egosystem.org/micros/gateway/services"
+	"egosystem.org/micros/internal"
 )
 
 var (
@@ -43,13 +44,20 @@ func Start() {
 	h := handlers.ProxyHandler{
 		Service: services.NewProxyService(proxyRepository),
 	}
+
 	if generateApiKey {
-		h.Service.SaveSecretKEY("local", "adadad")
+		word := internal.StringWithCharset()
+		apiKey := internal.ApiKeyGenerator(word)
+		_, err := h.Service.SaveSecretKEY("badger", apiKey)
+		if err != nil {
+			internal.LogError("genkey: Failed " + err.Error())
+		}
+		internal.LogInfo("genkey: Susscefull")
 	}
 
 	for _, endpoints := range endpoints {
 
-		handlers.ProxyGateway(endpoints)
+		h.ProxyGateway(endpoints)
 	}
 
 	server := &http.Server{

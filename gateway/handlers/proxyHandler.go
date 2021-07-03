@@ -9,7 +9,6 @@ import (
 
 	domain "egosystem.org/micros/gateway/domain"
 	services "egosystem.org/micros/gateway/services"
-	"egosystem.org/micros/internal"
 )
 
 type ProxyHandler struct {
@@ -24,7 +23,7 @@ func (ph *ProxyHandler) SaveSecretKEY(engine, apikey string) {
 	fmt.Println(result)
 }
 
-func ProxyGateway(endpoints domain.ProxyEndpoint) {
+func (ph *ProxyHandler) ProxyGateway(endpoints domain.ProxyEndpoint) {
 	for _, endpoint := range endpoints.Endpoints {
 
 		target, err := url.Parse(
@@ -51,13 +50,6 @@ func ProxyGateway(endpoints domain.ProxyEndpoint) {
 		)
 	}
 
-}
-
-// GetNameRandom get string names
-func GenRandomKEY(length int) string {
-	word := internal.StringWithCharset(length, internal.CHARSET)
-	apiKey := internal.ApiKeyGenerator(word)
-	return apiKey
 }
 
 func modifyRequest(req *http.Request) {

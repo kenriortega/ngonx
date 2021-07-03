@@ -8,12 +8,12 @@ import (
 	badger "github.com/dgraph-io/badger/v3"
 )
 
-type ProxyRepositoryDB struct {
+type ProxyRepositoryStorage struct {
 	clientBadger *badger.DB
 }
 
-func NewProxyRepository(clients ...interface{}) ProxyRepositoryDB {
-	var proxyRepositoryDB ProxyRepositoryDB
+func NewProxyRepository(clients ...interface{}) ProxyRepositoryStorage {
+	var proxyRepositoryDB ProxyRepositoryStorage
 	for _, c := range clients {
 		switch c.(type) {
 		case *badger.DB:
@@ -23,19 +23,23 @@ func NewProxyRepository(clients ...interface{}) ProxyRepositoryDB {
 	return proxyRepositoryDB
 }
 
-func (r ProxyRepositoryDB) SaveKEY(engine, apikey string) error {
+func (r ProxyRepositoryStorage) SaveKEY(engine, apikey string) error {
 	switch engine {
 	case "badger":
-		err := r.clientBadger.Update(func(txn *badger.Txn) error {
-			err := txn.Set([]byte("apikey"), []byte(apikey))
-			internal.LogError(err.Error())
-			return err
-		})
-		if err != nil {
-			internal.LogError(err.Error())
+		if err := r.clientBadger.Update(func(txn *badger.Txn) error {
+			if err := txn.Set([]byte("apikey"), []byte(apikey)); err != nil {
+				internal.LogError("savekey: failed")
+				return err
+			}
+			internal.LogInfo("savekey: successful")
+
+			return nil
+		}); err != nil {
+			internal.LogError("savekey: failed")
+
 			return err
 		}
-		defer r.clientBadger.Close()
+
 		return nil
 	case "local":
 		f, err := os.Create("./apikey")

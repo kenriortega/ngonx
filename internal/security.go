@@ -12,8 +12,11 @@ var (
 		rand.NewSource(time.Now().UnixNano()))
 )
 
-const CHARSET = "abcdefghijklmnopqrstuvwxyz" +
-	"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$*-/+"
+const (
+	CHARSET = "abcdefghijklmnopqrstuvwxyz" +
+		"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$*-/+"
+	SALT = 10
+)
 
 func ApiKeyGenerator(word string) string {
 	h := sha256.New()
@@ -25,10 +28,10 @@ func ApiKeyGenerator(word string) string {
 }
 
 // StringWithCharset generate words
-func StringWithCharset(length int, charset string) string {
-	b := make([]byte, length)
+func StringWithCharset() string {
+	b := make([]byte, SALT)
 	for i := range b {
-		b[i] = charset[seededRand.Intn(len(charset))]
+		b[i] = CHARSET[seededRand.Intn(len(CHARSET))]
 	}
 	return string(b)
 }

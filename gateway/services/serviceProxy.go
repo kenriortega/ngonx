@@ -17,6 +17,7 @@ func NewProxyService(repository domain.ProxyRepository) DefaultProxyService {
 }
 
 func (s DefaultProxyService) SaveSecretKEY(engine, apikey string) (string, error) {
+
 	err := s.repo.SaveKEY(engine, apikey)
 	if err != nil {
 		return "failed", err
