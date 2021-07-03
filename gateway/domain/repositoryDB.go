@@ -23,11 +23,11 @@ func NewProxyRepository(clients ...interface{}) ProxyRepositoryStorage {
 	return proxyRepositoryDB
 }
 
-func (r ProxyRepositoryStorage) SaveKEY(engine, apikey string) error {
+func (r ProxyRepositoryStorage) SaveKEY(engine, key, apikey string) error {
 	switch engine {
 	case "badger":
 		if err := r.clientBadger.Update(func(txn *badger.Txn) error {
-			if err := txn.Set([]byte("apikey"), []byte(apikey)); err != nil {
+			if err := txn.Set([]byte(key), []byte(apikey)); err != nil {
 				internal.LogError("savekey: failed")
 				return err
 			}
@@ -62,4 +62,27 @@ func (r ProxyRepositoryStorage) SaveKEY(engine, apikey string) error {
 		return nil
 	}
 	return nil
+}
+
+func (r ProxyRepositoryStorage) GetKEY(key string) (string, error) {
+	var apikey string
+
+	if err := r.clientBadger.View(func(txn *badger.Txn) error {
+		item, err := txn.Get([]byte(key))
+		if err != nil {
+			return err
+		}
+		if err := item.Value(func(value []byte) error {
+			apikey = string(value)
+			return nil
+		}); err != nil {
+			return err
+		}
+
+		return nil
+	}); err != nil {
+		return "", err
+	}
+
+	return apikey, nil
 }
