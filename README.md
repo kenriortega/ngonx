@@ -2,7 +2,9 @@
 PoC for learning how work proxy and load balancer like nginx server
 
 
-## Load Balancer command
+## GOproxy command
+
+> Build
 
 ```bash
 GOOS=linux go build -o goproxy .
