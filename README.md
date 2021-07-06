@@ -7,24 +7,28 @@ PoC for learning how work proxy and load balancer like nginx server
 > Build
 
 ```bash
-GOOS=linux go build -o goproxy .
-GOOS=windows go build -o goproxy.exe .
+make build
 ```
 
-> Start Proxy server
+> Start Proxy server first time
 
 `genkey` command in true generate random secretkey storaged on badgerdb on `badger.data`
 
 ```bash
-./goproxy --genkey true --port <port>
+./goproxy -portProxy 5000 -genkey true
+```
+
+> Start Proxy server
+
+```bash
+./goproxy -portProxy 5001
 ```
 
 > Start load balancer
 
 ```bash
-./goproxy --backends http://goproxy.com:3000,http://goproxy.com:3001,http://goproxy.com:3002 --port <port>
+./goproxy -type lb --backends "http://localhost:5000,http://localhost:5001,http://localhost:5002"
 ```
-
 
 > Start API PoC service
 
