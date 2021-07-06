@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -14,30 +13,7 @@ import (
 	services "github.com/kenriortega/goproxy/proxy/services"
 )
 
-var (
-	config         infra.Config
-	errConfig      error
-	endpoints      []domain.ProxyEndpoint
-	port           int
-	host           string
-	generateApiKey bool
-)
-
-func init() {
-	config, errConfig = infra.LoadConfig(".", "proxy.yaml")
-	if errConfig != nil {
-		log.Println(errConfig)
-	}
-	endpoints = config.ProxyGateway.EnpointsProxy
-	port = config.ProxyGateway.Port
-	host = config.ProxyGateway.Host
-	generateApiKey = false
-}
-
-func Start() {
-	flag.IntVar(&port, "port", port, "Port to serve")
-	flag.BoolVar(&generateApiKey, "genkey", generateApiKey, "Action for generate hash")
-	flag.Parse()
+func Start(generateApiKey bool, endpoints []domain.ProxyEndpoint, host string, port int) {
 
 	var proxyRepository domain.ProxyRepository
 	clientBadger := infra.GetBadgerDB(false)

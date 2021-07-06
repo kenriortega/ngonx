@@ -2,7 +2,6 @@ package cli
 
 import (
 	"context"
-	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -16,12 +15,7 @@ import (
 	handlers "github.com/kenriortega/goproxy/proxy/handlers"
 )
 
-func StartLB() {
-	var serverList string
-	var port int
-	flag.StringVar(&serverList, "backends", "", "Load balanced backends, use commas to separate")
-	flag.IntVar(&port, "port", 3030, "Port to serve")
-	flag.Parse()
+func StartLB(serverList string, port int) {
 
 	if len(serverList) == 0 {
 		log.Fatal("Please provide one or more backends to load balance")
