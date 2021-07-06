@@ -2,16 +2,14 @@ package main
 
 import (
 	"flag"
-	"log"
 	"runtime"
 
 	domain "github.com/kenriortega/goproxy/proxy/domain"
 
 	"github.com/kenriortega/goproxy/cmd/cli"
 	"github.com/kenriortega/goproxy/internal/infra"
+	"github.com/kenriortega/goproxy/internal/utils"
 )
-
-var ()
 
 var (
 	service        = "proxy"
@@ -23,12 +21,16 @@ var (
 	generateApiKey = false
 	serverList     = ""
 	portLB         = 3030
+	setingFile     = "goproxy.yaml"
 )
 
 func init() {
-	config, errConfig = infra.LoadConfig(".", "goproxy.yaml")
+	config, errConfig = infra.LoadConfig(".", setingFile)
 	if errConfig != nil {
-		log.Println(errConfig)
+		utils.LogError(errConfig.Error())
+		utils.LogInfo("config: Creating setting file by default")
+		// create empty file yml
+		utils.CreateSettingFile(setingFile)
 	}
 	endpoints = config.ProxyGateway.EnpointsProxy
 	portProxy = config.ProxyGateway.Port
@@ -38,6 +40,7 @@ func init() {
 	numcpu := runtime.NumCPU()
 	runtime.GOMAXPROCS(numcpu)
 }
+
 func main() {
 	flag.StringVar(&service, "type", service, "Main Service default is proxy")
 	flag.IntVar(&portProxy, "portProxy", portProxy, "Port to serve to run proxy")
