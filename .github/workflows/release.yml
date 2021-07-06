@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         # build and publish in parallel: linux/amd64
-        goos: [linux]
+        goos: [linux,windows,darwin]
         goarch: [amd64,arm]
     steps:
       - uses: actions/checkout@v2
