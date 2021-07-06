@@ -7,9 +7,9 @@ import (
 	"net/http/httputil"
 	"net/url"
 
-	"egosystem.org/micros/internal"
-	domain "egosystem.org/micros/proxy/domain"
-	services "egosystem.org/micros/proxy/services"
+	"github.com/kenriortega/goproxy/internal/utils"
+	domain "github.com/kenriortega/goproxy/proxy/domain"
+	services "github.com/kenriortega/goproxy/proxy/services"
 )
 
 type ProxyHandler struct {
@@ -41,7 +41,7 @@ func (ph *ProxyHandler) ProxyGateway(endpoints domain.ProxyEndpoint) {
 			originalDirector(req)
 			secretKey, err := ph.Service.GetKEY("secretKey")
 			if err != nil {
-				internal.LogError("getKey: failed " + err.Error())
+				utils.LogError("getKey: failed " + err.Error())
 			}
 			fmt.Println(secretKey)
 			modifyRequest(req)

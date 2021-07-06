@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	domain "egosystem.org/micros/proxy/domain"
+	domain "github.com/kenriortega/goproxy/proxy/domain"
 )
 
 var ServerPool domain.ServerPool

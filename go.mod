@@ -1,4 +1,4 @@
-module egosystem.org/micros
+module github.com/kenriortega/goproxy
 
 go 1.16
 

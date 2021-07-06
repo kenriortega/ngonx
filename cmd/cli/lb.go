@@ -11,9 +11,9 @@ import (
 	"strings"
 	"time"
 
-	domain "egosystem.org/micros/proxy/domain"
+	domain "github.com/kenriortega/goproxy/proxy/domain"
 
-	handlers "egosystem.org/micros/proxy/handlers"
+	handlers "github.com/kenriortega/goproxy/proxy/handlers"
 )
 
 func StartLB() {

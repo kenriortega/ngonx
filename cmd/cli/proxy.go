@@ -7,14 +7,15 @@ import (
 	"net/http"
 	"time"
 
-	"egosystem.org/micros/internal"
-	domain "egosystem.org/micros/proxy/domain"
-	handlers "egosystem.org/micros/proxy/handlers"
-	services "egosystem.org/micros/proxy/services"
+	"github.com/kenriortega/goproxy/internal/infra"
+	"github.com/kenriortega/goproxy/internal/utils"
+	domain "github.com/kenriortega/goproxy/proxy/domain"
+	handlers "github.com/kenriortega/goproxy/proxy/handlers"
+	services "github.com/kenriortega/goproxy/proxy/services"
 )
 
 var (
-	config         Config
+	config         infra.Config
 	errConfig      error
 	endpoints      []domain.ProxyEndpoint
 	port           int
@@ -23,7 +24,7 @@ var (
 )
 
 func init() {
-	config, errConfig = LoadConfig(".", "proxy.yaml")
+	config, errConfig = infra.LoadConfig(".", "proxy.yaml")
 	if errConfig != nil {
 		log.Println(errConfig)
 	}
@@ -39,20 +40,20 @@ func Start() {
 	flag.Parse()
 
 	var proxyRepository domain.ProxyRepository
-	clientBadger := GetBadgerDB(false)
+	clientBadger := infra.GetBadgerDB(false)
 	proxyRepository = domain.NewProxyRepository(clientBadger)
 	h := handlers.ProxyHandler{
 		Service: services.NewProxyService(proxyRepository),
 	}
 
 	if generateApiKey {
-		word := internal.StringWithCharset()
-		apiKey := internal.ApiKeyGenerator(word)
+		word := utils.StringWithCharset()
+		apiKey := utils.ApiKeyGenerator(word)
 		_, err := h.Service.SaveSecretKEY("badger", "secretKey", apiKey)
 		if err != nil {
-			internal.LogError("genkey: Failed " + err.Error())
+			utils.LogError("genkey: Failed " + err.Error())
 		}
-		internal.LogInfo("genkey: Susscefull")
+		utils.LogInfo("genkey: Susscefull")
 	}
 
 	for _, endpoints := range endpoints {

@@ -1,7 +1,7 @@
-package cli
+package infra
 
 import (
-	domain "egosystem.org/micros/proxy/domain"
+	domain "github.com/kenriortega/goproxy/proxy/domain"
 	"github.com/spf13/viper"
 )
 

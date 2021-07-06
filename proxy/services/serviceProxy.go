@@ -1,7 +1,7 @@
 package proxy
 
 import (
-	domain "egosystem.org/micros/proxy/domain"
+	domain "github.com/kenriortega/goproxy/proxy/domain"
 )
 
 type ProxyService interface {

@@ -1,8 +1,8 @@
-package cli
+package infra
 
 import (
-	"egosystem.org/micros/internal"
 	badger "github.com/dgraph-io/badger/v3"
+	"github.com/kenriortega/goproxy/internal/utils"
 )
 
 func GetBadgerDB(embedMem bool) *badger.DB {
@@ -15,7 +15,7 @@ func GetBadgerDB(embedMem bool) *badger.DB {
 
 	db, err := badger.Open(opt)
 	if err != nil {
-		internal.LogError(err.Error())
+		utils.LogError(err.Error())
 	}
 	// defer db.Close()
 	return db
