@@ -26,7 +26,7 @@ var (
 )
 
 func init() {
-	config, errConfig = infra.LoadConfig(".", "proxy.yaml")
+	config, errConfig = infra.LoadConfig(".", "goproxy.yaml")
 	if errConfig != nil {
 		log.Println(errConfig)
 	}
@@ -45,10 +45,12 @@ func main() {
 	flag.StringVar(&serverList, "backends", serverList, "Load balanced backends, use commas to separate")
 	flag.IntVar(&portLB, "portLB", portLB, "Port to serve to run load balancing")
 	flag.Parse()
+
 	switch service {
 	case "lb":
 		cli.StartLB(serverList, portLB)
 	case "proxy":
 		cli.Start(generateApiKey, endpoints, host, portProxy)
 	}
+
 }
