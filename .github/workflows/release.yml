@@ -10,9 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        # build and publish in parallel: linux/amd64
+        # build and publish in parallel: linux/amd64,windows/amd64,linux/darwin
         goos: [linux,windows,darwin]
-        goarch: [amd64,arm]
+        goarch: [amd64]
     steps:
       - uses: actions/checkout@v2
       - name: Run tests
@@ -26,3 +26,24 @@ jobs:
           binary_name: "goproxy"
           ldflags: "-s -w"
           # extra_files: LICENSE README.md
+  releases-matrix-arm:
+      name: Release Go Binary
+      runs-on: ubuntu-latest
+      strategy:
+        matrix:
+          # build and publish in parallel: linux/arm
+          goos: [linux]
+          goarch: [arm]
+      steps:
+        - uses: actions/checkout@v2
+        # - name: Run tests
+        #   run: go test -v -p=1 -timeout=0 ./...
+        - uses: wangyoucao577/go-release-action@v1.16
+          with:
+            github_token: ${{ secrets.GITHUB_TOKEN }}
+            goos: ${{ matrix.goos }}
+            goarch: ${{ matrix.goarch }}
+            project_path: "./cmd/"
+            binary_name: "goproxy"
+            ldflags: "-s -w"
+            # extra_files: LICENSE README.md
