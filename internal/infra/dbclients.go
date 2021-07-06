@@ -7,16 +7,21 @@ import (
 
 func GetBadgerDB(embedMem bool) *badger.DB {
 	var opt badger.Options
+	var clientBadger *badger.DB
 	if embedMem {
-		opt = badger.DefaultOptions("").WithInMemory(true)
+		opt = badger.DefaultOptions("").WithInMemory(true).WithBypassLockGuard(true)
 	} else {
-		opt = badger.DefaultOptions("./badger.data")
+		opt = badger.DefaultOptions("./badger.data").WithBypassLockGuard(true)
 	}
 
 	db, err := badger.Open(opt)
 	if err != nil {
 		utils.LogError(err.Error())
+
+		panic(err)
 	}
-	// defer db.Close()
-	return db
+	clientBadger = db
+	// defer clientBadger.Close()
+
+	return clientBadger
 }
