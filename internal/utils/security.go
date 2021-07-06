@@ -43,6 +43,8 @@ func CreateSettingFile(setingFile string) {
 proxy:
   host_proxy: 0.0.0.0
   port_proxy: 5000
+  cache_proxy:
+  	engine: badger # local|badgerDB|redis
   security:
     type: jwt # apikey|jwt|none
     secret_key: key00 # apikey jwtkey this value can be replace by genkey command
