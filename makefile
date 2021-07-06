@@ -1,5 +1,5 @@
 build:
-	GOOS=linux go build -o goproxy ./cmd/goproxy.go
+	GOOS=linux go build -o goproxy ./cmd/
 
 app:
 	./goproxy
