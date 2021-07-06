@@ -25,4 +25,4 @@ jobs:
           project_path: "./cmd/"
           binary_name: "goproxy"
           ldflags: "-s -w"
-          extra_files: LICENSE README.md
+          # extra_files: LICENSE README.md
