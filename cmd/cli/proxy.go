@@ -13,7 +13,7 @@ import (
 	services "github.com/kenriortega/goproxy/proxy/services"
 )
 
-func Start(generateApiKey bool, endpoints []domain.ProxyEndpoint, host string, port int, engine string) {
+func Start(generateApiKey bool, endpoints []domain.ProxyEndpoint, host string, port int, engine, securityType string) {
 
 	var proxyRepository domain.ProxyRepository
 	clientBadger := infra.GetBadgerDB(false)
@@ -34,7 +34,7 @@ func Start(generateApiKey bool, endpoints []domain.ProxyEndpoint, host string, p
 
 	for _, endpoints := range endpoints {
 
-		h.ProxyGateway(endpoints)
+		h.ProxyGateway(endpoints, securityType)
 	}
 
 	server := &http.Server{

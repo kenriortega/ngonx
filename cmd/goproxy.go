@@ -23,6 +23,7 @@ var (
 	portLB         = 3030
 	setingFile     = "goproxy.yaml"
 	engine         = "badger"
+	securityType   = "none"
 )
 
 func init() {
@@ -37,6 +38,7 @@ func init() {
 	portProxy = config.ProxyGateway.Port
 	host = config.ProxyGateway.Host
 	engine = config.ProxyCache.Engine
+	securityType = config.ProxySecurity.Type
 	generateApiKey = false
 
 	numcpu := runtime.NumCPU()
@@ -55,7 +57,7 @@ func main() {
 	case "lb":
 		cli.StartLB(serverList, portLB)
 	case "proxy":
-		cli.Start(generateApiKey, endpoints, host, portProxy, engine)
+		cli.Start(generateApiKey, endpoints, host, portProxy, engine, securityType)
 	}
 
 }

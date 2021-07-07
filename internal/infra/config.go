@@ -12,10 +12,14 @@ type Config struct {
 type ProxyGateway struct {
 	Host          string                 `mapstructure:"host_proxy"`
 	Port          int                    `mapstructure:"port_proxy"`
+	ProxySecurity ProxySecurity          `mapstructure:"security"`
 	ProxyCache    ProxyCache             `mapstructure:"cache_proxy"`
 	EnpointsProxy []domain.ProxyEndpoint `mapstructure:"services_proxy"`
 }
 
+type ProxySecurity struct {
+	Type string `mapstructure:"type"`
+}
 type ProxyCache struct {
 	Engine string `mapstructure:"engine"`
 }
