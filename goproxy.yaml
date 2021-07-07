@@ -4,8 +4,7 @@ proxy:
   cache_proxy:
     engine: badger # local|badgerDB|redis
   security:
-    type: jwt # apikey|jwt|none
-    secret_key: 12312312asadsd # apikey jwtkey this value can be replace by genkey command
+    type: apikey # apikey|jwt|none
   # maps of microservices with routes
   services_proxy:
       - name: microA

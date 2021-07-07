@@ -26,5 +26,5 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJCYW5rIiwic
 
 
 ###
-GET http://localhost:5000/health/
+GET http://localhost:5000/version/
 X-API-KEY: 6fa741de1bdd1d91830ba
