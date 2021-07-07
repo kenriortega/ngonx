@@ -10,7 +10,7 @@ type ProxyEndpoint struct {
 type Endpoint struct {
 	PathEndpoint  string `mapstructure:"path_endpoints"`
 	PathToProxy   string `mapstructure:"path_proxy"`
-	PathProtected string `mapstructure:"path_protected"`
+	PathProtected bool   `mapstructure:"path_protected"`
 }
 
 type ProxyRepository interface {
