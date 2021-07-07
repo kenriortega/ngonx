@@ -40,3 +40,10 @@ Install badger db on window if you don`t use CGO
 ```bash
 CGO_ENABLED=0 go get github.com/dgraph-io/badger/v3
 ```
+
+BenchMarking
+------------
+
+```bash
+ab -c 1000 -n 10000 http://localhost:5000/health
+```

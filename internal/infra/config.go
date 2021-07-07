@@ -17,7 +17,7 @@ type ProxyGateway struct {
 }
 
 type ProxyCache struct {
-	Engine string `mapstructure:"cache_proxy"`
+	Engine string `mapstructure:"engine"`
 }
 
 func LoadConfig(path, name string) (config Config, err error) {

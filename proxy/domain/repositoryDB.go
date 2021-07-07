@@ -51,7 +51,7 @@ func (r ProxyRepositoryStorage) SaveKEY(engine, key, apikey string) error {
 
 		defer f.Close()
 
-		data := []byte(fmt.Sprintf("apikey:%s", apikey))
+		data := []byte(fmt.Sprintf("%s:%s", key, apikey))
 
 		_, err = f.Write(data)
 
@@ -66,7 +66,7 @@ func (r ProxyRepositoryStorage) SaveKEY(engine, key, apikey string) error {
 
 func (r ProxyRepositoryStorage) GetKEY(key string) (string, error) {
 	var apikey string
-
+	fmt.Println(key)
 	if err := r.clientBadger.View(func(txn *badger.Txn) error {
 		item, err := txn.Get([]byte(key))
 		if err != nil {
