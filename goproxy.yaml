@@ -5,7 +5,7 @@ proxy:
     engine: badger # local|badgerDB|redis
     key: secretKey
   security:
-    type: jwt # apikey|jwt|none
+    type: apikey # apikey|jwt|none
   # maps of microservices with routes
   services_proxy:
       - name: microA

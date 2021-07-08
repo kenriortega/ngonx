@@ -64,7 +64,6 @@ func (ph *ProxyHandler) ProxyGateway(endpoints domain.ProxyEndpoint, key, securi
 
 			}
 			proxy.ErrorHandler = func(rw http.ResponseWriter, r *http.Request, err error) {
-				fmt.Printf("error was: %+v", err)
 				rw.WriteHeader(http.StatusInternalServerError)
 				rw.Write([]byte(err.Error()))
 			}
@@ -121,13 +120,16 @@ func checkJWTSecretKeyFromRequest(req *http.Request, key string) error {
 	return nil
 }
 func checkAPIKEYSecretKeyFromRequest(req *http.Request, ph *ProxyHandler, key string) {
-	secretKey, err := ph.Service.GetKEY(key)
+	apikey, err := ph.Service.GetKEY(key)
+	header := req.Header.Get("X-API-KEY")
 	if err != nil {
 		logger.LogError("getKey: failed " + err.Error())
 	}
-	fmt.Println(secretKey)
-	header := req.Header.Get("X-API-KEY")
-	fmt.Println(header)
+	if apikey == header {
+		fmt.Println(header)
+	} else {
+		fmt.Println("Invalid apikey")
+	}
 }
 
 func modifyResponse(err error) func(*http.Response) error {

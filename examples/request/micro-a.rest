@@ -27,4 +27,4 @@ Authorization: Bearerx eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJCYW5rIiwi
 
 ###
 GET http://localhost:5000/version/
-X-API-KEY: 6fa741de1bdd1d91830ba
+X-API-KEY: a869312b7c036f6dfa87675f8ac0aea451913f1dfcdbfe018adeb75cfe3d2c5b
