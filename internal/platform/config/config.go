@@ -1,7 +1,7 @@
-package infra
+package config
 
 import (
-	domain "github.com/kenriortega/goproxy/proxy/domain"
+	domain "github.com/kenriortega/goproxy/internal/proxy/domain"
 	"github.com/spf13/viper"
 )
 

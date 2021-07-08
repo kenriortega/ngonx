@@ -1,8 +1,8 @@
-package infra
+package badgerdb
 
 import (
 	badger "github.com/dgraph-io/badger/v3"
-	"github.com/kenriortega/goproxy/internal/utils"
+	"github.com/kenriortega/goproxy/internal/platform/logger"
 )
 
 func GetBadgerDB(embedMem bool) *badger.DB {
@@ -16,7 +16,7 @@ func GetBadgerDB(embedMem bool) *badger.DB {
 
 	db, err := badger.Open(opt)
 	if err != nil {
-		utils.LogError(err.Error())
+		logger.LogError(err.Error())
 
 		panic(err)
 	}

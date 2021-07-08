@@ -5,7 +5,7 @@ import (
 	"os"
 
 	badger "github.com/dgraph-io/badger/v3"
-	"github.com/kenriortega/goproxy/internal/utils"
+	"github.com/kenriortega/goproxy/internal/platform/logger"
 )
 
 type ProxyRepositoryStorage struct {
@@ -28,14 +28,14 @@ func (r ProxyRepositoryStorage) SaveKEY(engine, key, apikey string) error {
 	case "badger":
 		if err := r.clientBadger.Update(func(txn *badger.Txn) error {
 			if err := txn.Set([]byte(key), []byte(apikey)); err != nil {
-				utils.LogError("savekey: failed")
+				logger.LogError("savekey: failed")
 				return err
 			}
-			utils.LogInfo("savekey: successful")
+			logger.LogInfo("savekey: successful")
 
 			return nil
 		}); err != nil {
-			utils.LogError("savekey: failed")
+			logger.LogError("savekey: failed")
 
 			return err
 		}
@@ -45,7 +45,7 @@ func (r ProxyRepositoryStorage) SaveKEY(engine, key, apikey string) error {
 		f, err := os.Create("./apikey")
 
 		if err != nil {
-			utils.LogError(err.Error())
+			logger.LogError(err.Error())
 			return err
 		}
 
@@ -56,7 +56,7 @@ func (r ProxyRepositoryStorage) SaveKEY(engine, key, apikey string) error {
 		_, err = f.Write(data)
 
 		if err != nil {
-			utils.LogError(err.Error())
+			logger.LogError(err.Error())
 			return err
 		}
 		return nil

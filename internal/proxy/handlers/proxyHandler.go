@@ -7,8 +7,8 @@ import (
 	"net/http/httputil"
 	"net/url"
 
-	domain "github.com/kenriortega/goproxy/proxy/domain"
-	services "github.com/kenriortega/goproxy/proxy/services"
+	domain "github.com/kenriortega/goproxy/internal/proxy/domain"
+	services "github.com/kenriortega/goproxy/internal/proxy/services"
 )
 
 var proxy *httputil.ReverseProxy

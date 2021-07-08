@@ -10,9 +10,9 @@ import (
 	"strings"
 	"time"
 
-	domain "github.com/kenriortega/goproxy/proxy/domain"
+	domain "github.com/kenriortega/goproxy/internal/proxy/domain"
 
-	handlers "github.com/kenriortega/goproxy/proxy/handlers"
+	handlers "github.com/kenriortega/goproxy/internal/proxy/handlers"
 )
 
 func StartLB(serverList string, port int) {

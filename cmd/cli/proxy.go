@@ -6,17 +6,18 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/kenriortega/goproxy/internal/infra"
-	"github.com/kenriortega/goproxy/internal/utils"
-	domain "github.com/kenriortega/goproxy/proxy/domain"
-	handlers "github.com/kenriortega/goproxy/proxy/handlers"
-	services "github.com/kenriortega/goproxy/proxy/services"
+	"github.com/kenriortega/goproxy/internal/platform/badgerdb"
+	"github.com/kenriortega/goproxy/internal/platform/logger"
+	"github.com/kenriortega/goproxy/internal/platform/utils"
+	domain "github.com/kenriortega/goproxy/internal/proxy/domain"
+	handlers "github.com/kenriortega/goproxy/internal/proxy/handlers"
+	services "github.com/kenriortega/goproxy/internal/proxy/services"
 )
 
 func Start(generateApiKey bool, endpoints []domain.ProxyEndpoint, host string, port int, engine, securityType string) {
 
 	var proxyRepository domain.ProxyRepository
-	clientBadger := infra.GetBadgerDB(false)
+	clientBadger := badgerdb.GetBadgerDB(false)
 	proxyRepository = domain.NewProxyRepository(clientBadger)
 	h := handlers.ProxyHandler{
 		Service: services.NewProxyService(proxyRepository),
@@ -27,9 +28,9 @@ func Start(generateApiKey bool, endpoints []domain.ProxyEndpoint, host string, p
 		apiKey := utils.ApiKeyGenerator(word)
 		_, err := h.Service.SaveSecretKEY(engine, "secretKey", apiKey)
 		if err != nil {
-			utils.LogError("genkey: Failed " + err.Error())
+			logger.LogError("genkey: Failed " + err.Error())
 		}
-		utils.LogInfo("genkey: Susscefull")
+		logger.LogInfo("genkey: Susscefull")
 	}
 
 	for _, endpoints := range endpoints {

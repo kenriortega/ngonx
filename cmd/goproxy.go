@@ -4,16 +4,17 @@ import (
 	"flag"
 	"runtime"
 
-	domain "github.com/kenriortega/goproxy/proxy/domain"
+	domain "github.com/kenriortega/goproxy/internal/proxy/domain"
 
 	"github.com/kenriortega/goproxy/cmd/cli"
-	"github.com/kenriortega/goproxy/internal/infra"
-	"github.com/kenriortega/goproxy/internal/utils"
+	"github.com/kenriortega/goproxy/internal/platform/config"
+	"github.com/kenriortega/goproxy/internal/platform/logger"
+	"github.com/kenriortega/goproxy/internal/platform/utils"
 )
 
 var (
 	service        = "proxy"
-	config         infra.Config
+	configFromYaml config.Config
 	errConfig      error
 	endpoints      []domain.ProxyEndpoint
 	portProxy      int
@@ -27,18 +28,18 @@ var (
 )
 
 func init() {
-	config, errConfig = infra.LoadConfig(".", setingFile)
+	configFromYaml, errConfig = config.LoadConfig(".", setingFile)
 	if errConfig != nil {
-		utils.LogError(errConfig.Error())
-		utils.LogInfo("config: Creating setting file by default")
+		logger.LogError(errConfig.Error())
+		logger.LogInfo("config: Creating setting file by default")
 		// create empty file yml
 		utils.CreateSettingFile(setingFile)
 	}
-	endpoints = config.ProxyGateway.EnpointsProxy
-	portProxy = config.ProxyGateway.Port
-	host = config.ProxyGateway.Host
-	engine = config.ProxyCache.Engine
-	securityType = config.ProxySecurity.Type
+	endpoints = configFromYaml.ProxyGateway.EnpointsProxy
+	portProxy = configFromYaml.ProxyGateway.Port
+	host = configFromYaml.ProxyGateway.Host
+	engine = configFromYaml.ProxyCache.Engine
+	securityType = configFromYaml.ProxySecurity.Type
 	generateApiKey = false
 
 	numcpu := runtime.NumCPU()

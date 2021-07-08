@@ -1,7 +1,7 @@
 package proxy
 
 import (
-	domain "github.com/kenriortega/goproxy/proxy/domain"
+	domain "github.com/kenriortega/goproxy/internal/proxy/domain"
 )
 
 type ProxyService interface {

@@ -6,6 +6,8 @@ import (
 	"math/rand"
 	"os"
 	"time"
+
+	"github.com/kenriortega/goproxy/internal/platform/logger"
 )
 
 var (
@@ -23,7 +25,7 @@ func ApiKeyGenerator(word string) string {
 	h := sha256.New()
 	_, err := h.Write([]byte(word))
 	if err != nil {
-		LogError("Error")
+		logger.LogError("Error")
 	}
 	return fmt.Sprintf("%x", h.Sum(nil))
 }
@@ -58,7 +60,7 @@ proxy:
             path_protected: false
 		`
 	if err != nil {
-		LogError(err.Error())
+		logger.LogError(err.Error())
 	}
 
 	defer f.Close()
@@ -68,6 +70,6 @@ proxy:
 	_, err = f.Write(data)
 
 	if err != nil {
-		LogError(err.Error())
+		logger.LogError(err.Error())
 	}
 }
