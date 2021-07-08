@@ -126,7 +126,7 @@ func checkAPIKEYSecretKeyFromRequest(req *http.Request, ph *ProxyHandler, key st
 		logger.LogError("getKey: failed " + err.Error())
 	}
 	if apikey == header {
-		fmt.Println(header)
+		fmt.Println("OK")
 	} else {
 		fmt.Println("Invalid apikey")
 	}

@@ -40,8 +40,8 @@ func init() {
 	portProxy = configFromYaml.ProxyGateway.Port
 	host = configFromYaml.ProxyGateway.Host
 	engine = configFromYaml.ProxyCache.Engine
-	key = configFromYaml.ProxyCache.Key
 	securityType = configFromYaml.ProxySecurity.Type
+	key = configFromYaml.ProxyCache.Key + "_" + securityType
 	generateApiKey = false
 
 	numcpu := runtime.NumCPU()
