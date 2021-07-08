@@ -26,6 +26,7 @@ var (
 	engine         = "badger"
 	key            = "secretKey"
 	securityType   = "none"
+	prevKey        = ""
 )
 
 func init() {
@@ -52,6 +53,7 @@ func main() {
 	flag.StringVar(&service, "type", service, "Main Service default is proxy")
 	flag.IntVar(&portProxy, "portProxy", portProxy, "Port to serve to run proxy")
 	flag.BoolVar(&generateApiKey, "genkey", generateApiKey, "Action for generate hash for protected routes")
+	flag.StringVar(&prevKey, "prevkey", prevKey, "Action for save a previous hash for protected routes to validate JWT")
 	flag.StringVar(&serverList, "backends", serverList, "Load balanced backends, use commas to separate")
 	flag.IntVar(&portLB, "portLB", portLB, "Port to serve to run load balancing")
 	flag.Parse()
@@ -60,7 +62,16 @@ func main() {
 	case "lb":
 		cli.StartLB(serverList, portLB)
 	case "proxy":
-		cli.Start(generateApiKey, endpoints, host, portProxy, engine, key, securityType)
+		cli.Start(
+			generateApiKey,
+			endpoints,
+			host,
+			portProxy,
+			engine,
+			key,
+			prevKey,
+			securityType,
+		)
 	}
 
 }

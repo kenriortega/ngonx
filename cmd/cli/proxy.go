@@ -14,7 +14,7 @@ import (
 	services "github.com/kenriortega/goproxy/internal/proxy/services"
 )
 
-func Start(generateApiKey bool, endpoints []domain.ProxyEndpoint, host string, port int, engine, key, securityType string) {
+func Start(generateApiKey bool, endpoints []domain.ProxyEndpoint, host string, port int, engine, key, prevKey, securityType string) {
 
 	var proxyRepository domain.ProxyRepository
 	clientBadger := badgerdb.GetBadgerDB(false)
@@ -31,6 +31,15 @@ func Start(generateApiKey bool, endpoints []domain.ProxyEndpoint, host string, p
 			logger.LogError("genkey: Failed " + err.Error())
 		}
 		logger.LogInfo("genkey: Susscefull")
+	}
+	if prevKey != "" {
+		// word := prevKey
+		// apiKey := utils.ApiKeyGenerator(word)
+		_, err := h.Service.SaveSecretKEY(engine, key, prevKey)
+		if err != nil {
+			logger.LogError("prevKey: Failed " + err.Error())
+		}
+		logger.LogInfo("prevKey: Susscefull")
 	}
 
 	for _, endpoints := range endpoints {
