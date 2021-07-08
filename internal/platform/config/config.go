@@ -22,6 +22,7 @@ type ProxySecurity struct {
 }
 type ProxyCache struct {
 	Engine string `mapstructure:"engine"`
+	Key    string `mapstructure:"key"`
 }
 
 func LoadConfig(path, name string) (config Config, err error) {

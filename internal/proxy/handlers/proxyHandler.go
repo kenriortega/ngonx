@@ -6,13 +6,26 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"strings"
+	"time"
 
+	"github.com/kenriortega/goproxy/internal/platform/errors"
+	"github.com/kenriortega/goproxy/internal/platform/logger"
+
+	"github.com/gbrlsnchs/jwt/v3"
 	domain "github.com/kenriortega/goproxy/internal/proxy/domain"
 	services "github.com/kenriortega/goproxy/internal/proxy/services"
 )
 
 var proxy *httputil.ReverseProxy
 
+type JWTPayload struct {
+	jwt.Payload
+}
+type ResponseMiddleware struct {
+	Message string `json:"message"`
+	Code    int    `json:"code"`
+}
 type ProxyHandler struct {
 	Service services.DefaultProxyService
 }
@@ -25,7 +38,7 @@ func (ph *ProxyHandler) SaveSecretKEY(engine, key, apikey string) {
 	fmt.Println(result)
 }
 
-func (ph *ProxyHandler) ProxyGateway(endpoints domain.ProxyEndpoint, securityType string) {
+func (ph *ProxyHandler) ProxyGateway(endpoints domain.ProxyEndpoint, key, securityType string) {
 	for _, endpoint := range endpoints.Endpoints {
 
 		target, err := url.Parse(
@@ -36,7 +49,6 @@ func (ph *ProxyHandler) ProxyGateway(endpoints domain.ProxyEndpoint, securityTyp
 		}
 		if endpoint.PathProtected {
 			proxy = httputil.NewSingleHostReverseProxy(target)
-			proxy.ModifyResponse = modifyResponse()
 
 			originalDirector := proxy.Director
 			proxy.Director = func(req *http.Request) {
@@ -44,11 +56,17 @@ func (ph *ProxyHandler) ProxyGateway(endpoints domain.ProxyEndpoint, securityTyp
 
 				switch securityType {
 				case "jwt":
-					checkJWTSecretKeyFromRequest(req)
+					err := checkJWTSecretKeyFromRequest(req, key)
+					proxy.ModifyResponse = modifyResponse(err)
 				case "apikey":
-					checkAPIKEYSecretKeyFromRequest(req)
+					checkAPIKEYSecretKeyFromRequest(req, ph, key)
 				}
 
+			}
+			proxy.ErrorHandler = func(rw http.ResponseWriter, r *http.Request, err error) {
+				fmt.Printf("error was: %+v", err)
+				rw.WriteHeader(http.StatusInternalServerError)
+				rw.Write([]byte(err.Error()))
 			}
 			http.Handle(
 				endpoint.PathToProxy,
@@ -60,7 +78,6 @@ func (ph *ProxyHandler) ProxyGateway(endpoints domain.ProxyEndpoint, securityTyp
 		} else {
 
 			proxy = httputil.NewSingleHostReverseProxy(target)
-			proxy.ModifyResponse = modifyResponse()
 
 			originalDirector := proxy.Director
 			proxy.Director = func(req *http.Request) {
@@ -77,23 +94,49 @@ func (ph *ProxyHandler) ProxyGateway(endpoints domain.ProxyEndpoint, securityTyp
 	}
 }
 
-func checkJWTSecretKeyFromRequest(req *http.Request) {
+func checkJWTSecretKeyFromRequest(req *http.Request, key string) error {
 	header := req.Header.Get("Authorization")
-	fmt.Println(header)
-	// secretKey, err := ph.Service.GetKEY("secretKey")
-	// if err != nil {
-	// 	utils.LogError("getKey: failed " + err.Error())
-	// }
-	// fmt.Println(secretKey)
+	hs := jwt.NewHS256([]byte(key))
+	now := time.Now()
+	if !strings.HasPrefix(header, "Bearer ") {
+		custonError := errors.NewError("Format is Authorization: Bearer [token]")
+		logger.LogError(custonError.Error())
+		return custonError
+	}
+	token := strings.Split(header, " ")[1]
+	pl := JWTPayload{}
+	expValidator := jwt.ExpirationTimeValidator(now)
+	validatePayload := jwt.ValidatePayload(&pl.Payload, expValidator)
+	_, err := jwt.Verify([]byte(token), hs, &pl, validatePayload)
+
+	if errors.ErrorIs(err, jwt.ErrExpValidation) {
+		logger.LogError(err.Error())
+		return err
+	}
+	if errors.ErrorIs(err, jwt.ErrHMACVerification) {
+		logger.LogError(err.Error())
+		return err
+	}
+
+	return nil
 }
-func checkAPIKEYSecretKeyFromRequest(req *http.Request) {
+func checkAPIKEYSecretKeyFromRequest(req *http.Request, ph *ProxyHandler, key string) {
+	secretKey, err := ph.Service.GetKEY(key)
+	if err != nil {
+		logger.LogError("getKey: failed " + err.Error())
+	}
+	fmt.Println(secretKey)
 	header := req.Header.Get("X-API-KEY")
 	fmt.Println(header)
 }
 
-func modifyResponse() func(*http.Response) error {
+func modifyResponse(err error) func(*http.Response) error {
 	return func(resp *http.Response) error {
 		resp.Header.Set("X-Proxy", "EgoProxy")
+
+		if err != nil {
+			return err
+		}
 		return nil
 	}
 }

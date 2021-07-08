@@ -3,8 +3,9 @@ proxy:
   port_proxy: 5000
   cache_proxy:
     engine: badger # local|badgerDB|redis
+    key: secretKey
   security:
-    type: apikey # apikey|jwt|none
+    type: jwt # apikey|jwt|none
   # maps of microservices with routes
   services_proxy:
       - name: microA
