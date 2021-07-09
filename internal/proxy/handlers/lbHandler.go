@@ -1,10 +1,12 @@
 package proxy
 
 import (
-	"log"
+	"fmt"
 	"net/http"
 	"time"
 
+	"github.com/kenriortega/goproxy/internal/platform/errors"
+	"github.com/kenriortega/goproxy/internal/platform/logger"
 	domain "github.com/kenriortega/goproxy/internal/proxy/domain"
 )
 
@@ -30,8 +32,8 @@ func GetRetryFromContext(r *http.Request) int {
 func Lbalancer(w http.ResponseWriter, r *http.Request) {
 	attempts := GetAttemptsFromContext(r)
 	if attempts > 3 {
-		log.Printf("%s(%s) Max attempts reached, terminating\n", r.RemoteAddr, r.URL.Path)
-		http.Error(w, "Service not available", http.StatusServiceUnavailable)
+		logger.LogInfo(fmt.Sprintf("%s(%s) Max attempts reached, terminating\n", r.RemoteAddr, r.URL.Path))
+		http.Error(w, errors.ErrLBHttp.Error(), http.StatusServiceUnavailable)
 		return
 	}
 
@@ -40,15 +42,15 @@ func Lbalancer(w http.ResponseWriter, r *http.Request) {
 		peer.ReverseProxy.ServeHTTP(w, r)
 		return
 	}
-	http.Error(w, "Service not available", http.StatusServiceUnavailable)
+	http.Error(w, errors.ErrLBHttp.Error(), http.StatusServiceUnavailable)
 }
 
 // healthCheck runs a routine for check status of the backends every 2 mins
 func HealthCheck() {
 	t := time.NewTicker(time.Minute * 1)
 	for range t.C {
-		log.Println("Starting health check...")
+		logger.LogInfo("Starting health check...")
 		ServerPool.HealthCheck()
-		log.Println("Health check completed")
+		logger.LogInfo("Health check completed")
 	}
 }

@@ -18,4 +18,6 @@ var (
 	ErrGetkeyTX            = NewError("baderdb: error executing TX to get value")
 	ErrGetkeyValue         = NewError("baderdb: error executing get item value")
 	ErrGetkeyView          = NewError("baderdb: error executing get view")
+	// lbHandler
+	ErrLBHttp = NewError("lbHandler: error service not availeble")
 )
