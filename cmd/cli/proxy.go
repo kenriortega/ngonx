@@ -2,7 +2,6 @@ package cli
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 
@@ -55,8 +54,8 @@ func Start(generateApiKey bool, endpoints []domain.ProxyEndpoint, host string, p
 		ReadTimeout:  15 * time.Second,
 	}
 
-	log.Printf("Proxy started at :%d\n", port)
+	logger.LogInfo(fmt.Sprintf("Proxy started at :%d\n", port))
 	if err := server.ListenAndServe(); err != nil {
-		log.Fatal(err)
+		logger.LogError(err.Error())
 	}
 }
