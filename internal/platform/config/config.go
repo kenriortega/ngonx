@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/kenriortega/goproxy/internal/platform/errors"
 	domain "github.com/kenriortega/goproxy/internal/proxy/domain"
 	"github.com/spf13/viper"
 )
@@ -32,8 +33,11 @@ func LoadConfig(path, name string) (config Config, err error) {
 
 	err = viper.ReadInConfig()
 	if err != nil {
+		err = errors.ErrReadConfig
 		return
 	}
 	err = viper.Unmarshal(&config)
+	err = errors.ErrUnmarshalConfig
+
 	return
 }

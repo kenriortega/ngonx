@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/kenriortega/goproxy/internal/platform/errors"
 	"github.com/kenriortega/goproxy/internal/platform/logger"
 )
 
@@ -25,7 +26,7 @@ func ApiKeyGenerator(word string) string {
 	h := sha256.New()
 	_, err := h.Write([]byte(word))
 	if err != nil {
-		logger.LogError("Error")
+		logger.LogError(errors.ErrApiKeyGenerator.Error())
 	}
 	return fmt.Sprintf("%x", h.Sum(nil))
 }
@@ -46,7 +47,8 @@ proxy:
   host_proxy: 0.0.0.0
   port_proxy: 5000
   cache_proxy:
-  	engine: badger # local|badgerDB|redis
+    engine: badger # local|badgerDB|redis
+    key: secretKey
   security:
     type: jwt # apikey|jwt|none
     secret_key: key00 # apikey jwtkey this value can be replace by genkey command
@@ -60,16 +62,16 @@ proxy:
             path_protected: false
 		`
 	if err != nil {
-		logger.LogError(err.Error())
+		logger.LogError(errors.ErrCreatingSettingFile.Error())
 	}
 
 	defer f.Close()
 
-	data := []byte(fmt.Sprintf("apikey:%s", ymldata))
+	data := []byte(ymldata)
 
 	_, err = f.Write(data)
 
 	if err != nil {
-		logger.LogError(err.Error())
+		logger.LogError(errors.ErrWritingSettingFile.Error())
 	}
 }
