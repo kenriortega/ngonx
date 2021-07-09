@@ -60,7 +60,7 @@ proxy:
           - path_endpoints: /api/v1/health/
             path_proxy: /health/
             path_protected: false
-		`
+`
 	if err != nil {
 		logger.LogError(errors.ErrCreatingSettingFile.Error())
 	}
