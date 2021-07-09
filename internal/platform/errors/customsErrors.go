@@ -11,7 +11,8 @@ var (
 	// loadbalancer
 	ErrIsBackendAlive = NewError("lb: Site unreachcable dial tcp")
 	// repositoryDB
-	ErrSavekeyUpdateTX    = NewError("badgerdb: error executing TX to save apikey")
-	ErrSavekeyUpdate      = NewError("badgerdb: error to save apikey")
-	ErrSavekeyCreateLocal = NewError("localfile: error to save apikey")
+	ErrSavekeyUpdateTX     = NewError("badgerdb: error executing TX to save apikey")
+	ErrSavekeyUpdate       = NewError("badgerdb: error to save apikey")
+	ErrSavekeyCreateLocal  = NewError("localfile: error to save apikey")
+	ErrSavekeyWriteOnLocal = NewError("localfile: error to write data on local file")
 )
