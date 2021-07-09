@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/kenriortega/goproxy/internal/platform/badgerdb"
+	"github.com/kenriortega/goproxy/internal/platform/genkey"
 	"github.com/kenriortega/goproxy/internal/platform/logger"
-	"github.com/kenriortega/goproxy/internal/platform/utils"
 	domain "github.com/kenriortega/goproxy/internal/proxy/domain"
 	handlers "github.com/kenriortega/goproxy/internal/proxy/handlers"
 	services "github.com/kenriortega/goproxy/internal/proxy/services"
@@ -23,8 +23,8 @@ func Start(generateApiKey bool, endpoints []domain.ProxyEndpoint, host string, p
 	}
 
 	if generateApiKey {
-		word := utils.StringWithCharset()
-		apiKey := utils.ApiKeyGenerator(word)
+		word := genkey.StringWithCharset()
+		apiKey := genkey.ApiKeyGenerator(word)
 		_, err := h.Service.SaveSecretKEY(engine, key, apiKey)
 		if err != nil {
 			logger.LogError("genkey: Failed " + err.Error())

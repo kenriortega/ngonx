@@ -9,7 +9,6 @@ import (
 	"github.com/kenriortega/goproxy/cmd/cli"
 	"github.com/kenriortega/goproxy/internal/platform/config"
 	"github.com/kenriortega/goproxy/internal/platform/logger"
-	"github.com/kenriortega/goproxy/internal/platform/utils"
 )
 
 var (
@@ -35,7 +34,7 @@ func init() {
 		logger.LogError(errConfig.Error())
 		logger.LogInfo("config: Creating setting file by default")
 		// create empty file yml
-		utils.CreateSettingFile(setingFile)
+		configFromYaml.CreateSettingFile(setingFile)
 	}
 	endpoints = configFromYaml.ProxyGateway.EnpointsProxy
 	portProxy = configFromYaml.ProxyGateway.Port
