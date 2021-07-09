@@ -15,4 +15,7 @@ var (
 	ErrSavekeyUpdate       = NewError("badgerdb: error to save apikey")
 	ErrSavekeyCreateLocal  = NewError("localfile: error to save apikey")
 	ErrSavekeyWriteOnLocal = NewError("localfile: error to write data on local file")
+	ErrGetkeyTX            = NewError("baderdb: error executing TX to get value")
+	ErrGetkeyValue         = NewError("baderdb: error executing get item value")
+	ErrGetkeyView          = NewError("baderdb: error executing get view")
 )

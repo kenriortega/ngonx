@@ -70,18 +70,18 @@ func (r ProxyRepositoryStorage) GetKEY(key string) (string, error) {
 	if err := r.clientBadger.View(func(txn *badger.Txn) error {
 		item, err := txn.Get([]byte(key))
 		if err != nil {
-			return err
+			return errors.ErrGetkeyTX
 		}
 		if err := item.Value(func(value []byte) error {
 			apikey = string(value)
 			return nil
 		}); err != nil {
-			return err
+			return errors.ErrGetkeyValue
 		}
 
 		return nil
 	}); err != nil {
-		return "", err
+		return "", errors.ErrGetkeyView
 	}
 
 	return apikey, nil
