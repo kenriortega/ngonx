@@ -10,12 +10,36 @@ PoC for learning how work proxy and load balancer like nginx server
 make build
 ```
 
-> Start Proxy server first time
+> List of command available
 
-`genkey` command in true generate random secretkey storaged on badgerdb on `badger.data`
+```bash
+
+  -backends string
+        Load balanced backends, use commas to separate
+  -genkey
+        Action for generate hash for protected routes
+  -portLB int
+        Port to serve to run load balancing (default 3030)
+  -portProxy int
+        Port to serve to run proxy (default 5000)
+  -prevkey string
+        Action for save a previous hash for protected routes to validate JWT
+  -type string
+        Main Service default is proxy (default "proxy")
+```
+
+> Start Proxy server first time 
+
+`genkey` command in true generate random secretkey and save on badgerdb on `badger.data`
 
 ```bash
 ./goproxy -portProxy 5000 -genkey true
+```
+
+`prevkey` command receive a custom secretkey and save this on badgerdb on `badger.data`
+
+```bash
+./goproxy -portProxy 5000 -prevkey <secretKey>
 ```
 
 > Start Proxy server
