@@ -1,13 +1,16 @@
 package proxy
 
 import (
-	"log"
+	"fmt"
 	"net"
 	"net/http/httputil"
 	"net/url"
 	"sync"
 	"sync/atomic"
 	"time"
+
+	"github.com/kenriortega/goproxy/internal/platform/errors"
+	"github.com/kenriortega/goproxy/internal/platform/logger"
 )
 
 // Load Balancer data structures...
@@ -93,7 +96,7 @@ func (s *ServerPool) HealthCheck() {
 		if !alive {
 			status = "down"
 		}
-		log.Printf("%s [%s]\n", b.URL, status)
+		logger.LogInfo(fmt.Sprintf("%s [%s]\n", b.URL, status))
 	}
 }
 
@@ -102,7 +105,7 @@ func isBackendAlive(u *url.URL) bool {
 	timeout := 2 * time.Second
 	conn, err := net.DialTimeout("tcp", u.Host, timeout)
 	if err != nil {
-		log.Println("Site unreachable, error: ", err)
+		logger.LogError(errors.ErrIsBackendAlive.Error())
 		return false
 	}
 	_ = conn.Close()
