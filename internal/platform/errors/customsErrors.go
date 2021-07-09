@@ -19,5 +19,8 @@ var (
 	ErrGetkeyValue         = NewError("baderdb: error executing get item value")
 	ErrGetkeyView          = NewError("baderdb: error executing get view")
 	// lbHandler
-	ErrLBHttp = NewError("lbHandler: error service not availeble")
+	ErrLBHttp              = NewError("lbHandler: error service not availeble")
+	ErrBearerTokenFormat   = NewError("proxyHandler: error Format is Authorization: Bearer [token]")
+	ErrTokenExpValidation  = NewError("proxyHandler: error token expired")
+	ErrTokenHMACValidation = NewError("proxyHandler: error HMAC verification failed")
 )

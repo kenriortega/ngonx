@@ -2,7 +2,6 @@ package proxy
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -33,9 +32,9 @@ type ProxyHandler struct {
 func (ph *ProxyHandler) SaveSecretKEY(engine, key, apikey string) {
 	result, err := ph.Service.SaveSecretKEY(engine, key, apikey)
 	if err != nil {
-		fmt.Println(result)
+		logger.LogInfo(result)
 	}
-	fmt.Println(result)
+	logger.LogInfo(result)
 }
 
 func (ph *ProxyHandler) ProxyGateway(endpoints domain.ProxyEndpoint, key, securityType string) {
@@ -45,7 +44,7 @@ func (ph *ProxyHandler) ProxyGateway(endpoints domain.ProxyEndpoint, key, securi
 			fmt.Sprintf("%s%s", endpoints.HostURI, endpoint.PathEndpoint),
 		)
 		if err != nil {
-			log.Fatal(err)
+			logger.LogError(err.Error())
 		}
 		if endpoint.PathProtected {
 			proxy = httputil.NewSingleHostReverseProxy(target)
@@ -98,9 +97,8 @@ func checkJWTSecretKeyFromRequest(req *http.Request, key string) error {
 	hs := jwt.NewHS256([]byte(key))
 	now := time.Now()
 	if !strings.HasPrefix(header, "Bearer ") {
-		custonError := errors.NewError("Format is Authorization: Bearer [token]")
-		logger.LogError(custonError.Error())
-		return custonError
+		logger.LogError(errors.ErrBearerTokenFormat.Error())
+		return errors.ErrBearerTokenFormat
 	}
 	token := strings.Split(header, " ")[1]
 	pl := JWTPayload{}
@@ -109,12 +107,12 @@ func checkJWTSecretKeyFromRequest(req *http.Request, key string) error {
 	_, err := jwt.Verify([]byte(token), hs, &pl, validatePayload)
 
 	if errors.ErrorIs(err, jwt.ErrExpValidation) {
-		logger.LogError(err.Error())
-		return err
+		logger.LogError(errors.ErrTokenExpValidation.Error())
+		return errors.ErrTokenExpValidation
 	}
 	if errors.ErrorIs(err, jwt.ErrHMACVerification) {
-		logger.LogError(err.Error())
-		return err
+		logger.LogError(errors.ErrTokenHMACValidation.Error())
+		return errors.ErrTokenHMACValidation
 	}
 
 	return nil
@@ -123,19 +121,18 @@ func checkAPIKEYSecretKeyFromRequest(req *http.Request, ph *ProxyHandler, key st
 	apikey, err := ph.Service.GetKEY(key)
 	header := req.Header.Get("X-API-KEY")
 	if err != nil {
-		logger.LogError("getKey: failed " + err.Error())
+		logger.LogError(errors.ErrGetkeyView.Error())
 	}
 	if apikey == header {
-		fmt.Println("OK")
+		logger.LogInfo("OK")
 	} else {
-		fmt.Println("Invalid apikey")
+		logger.LogInfo("Invalid apikey")
 	}
 }
 
 func modifyResponse(err error) func(*http.Response) error {
 	return func(resp *http.Response) error {
 		resp.Header.Set("X-Proxy", "EgoProxy")
-
 		if err != nil {
 			return err
 		}
