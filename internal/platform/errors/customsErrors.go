@@ -10,4 +10,8 @@ var (
 	ErrWritingSettingFile  = NewError("security: error on write setting file")
 	// loadbalancer
 	ErrIsBackendAlive = NewError("lb: Site unreachcable dial tcp")
+	// repositoryDB
+	ErrSavekeyUpdateTX    = NewError("badgerdb: error executing TX to save apikey")
+	ErrSavekeyUpdate      = NewError("badgerdb: error to save apikey")
+	ErrSavekeyCreateLocal = NewError("localfile: error to save apikey")
 )

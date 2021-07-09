@@ -5,6 +5,7 @@ import (
 	"os"
 
 	badger "github.com/dgraph-io/badger/v3"
+	"github.com/kenriortega/goproxy/internal/platform/errors"
 	"github.com/kenriortega/goproxy/internal/platform/logger"
 )
 
@@ -28,16 +29,15 @@ func (r ProxyRepositoryStorage) SaveKEY(engine, key, apikey string) error {
 	case "badger":
 		if err := r.clientBadger.Update(func(txn *badger.Txn) error {
 			if err := txn.Set([]byte(key), []byte(apikey)); err != nil {
-				logger.LogError("savekey: failed")
-				return err
+				logger.LogError(errors.ErrSavekeyUpdateTX.Error())
+				return errors.ErrSavekeyUpdateTX
 			}
 			logger.LogInfo("savekey: successful")
 
 			return nil
 		}); err != nil {
-			logger.LogError("savekey: failed")
-
-			return err
+			logger.LogError(errors.ErrSavekeyUpdate.Error())
+			return errors.ErrSavekeyUpdate
 		}
 
 		return nil
@@ -45,8 +45,8 @@ func (r ProxyRepositoryStorage) SaveKEY(engine, key, apikey string) error {
 		f, err := os.Create("./apikey")
 
 		if err != nil {
-			logger.LogError(err.Error())
-			return err
+			logger.LogError(errors.ErrSavekeyCreateLocal.Error())
+			return errors.ErrSavekeyCreateLocal
 		}
 
 		defer f.Close()
@@ -56,8 +56,8 @@ func (r ProxyRepositoryStorage) SaveKEY(engine, key, apikey string) error {
 		_, err = f.Write(data)
 
 		if err != nil {
-			logger.LogError(err.Error())
-			return err
+			logger.LogError(errors.ErrSavekeyWriteOnLocal.Error())
+			return errors.ErrSavekeyWriteOnLocal
 		}
 		return nil
 	}
