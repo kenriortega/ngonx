@@ -45,7 +45,7 @@ func Lbalancer(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, errors.ErrLBHttp.Error(), http.StatusServiceUnavailable)
 }
 
-// healthCheck runs a routine for check status of the backends every 2 mins
+// HealthCheck runs a routine for check status of the backends every 2 mins
 func HealthCheck() {
 	t := time.NewTicker(time.Minute * 1)
 	for range t.C {

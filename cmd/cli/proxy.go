@@ -32,8 +32,6 @@ func Start(generateApiKey bool, endpoints []domain.ProxyEndpoint, host string, p
 		logger.LogInfo("genkey: Susscefull")
 	}
 	if prevKey != "" {
-		// word := prevKey
-		// apiKey := utils.ApiKeyGenerator(word)
 		_, err := h.Service.SaveSecretKEY(engine, key, prevKey)
 		if err != nil {
 			logger.LogError("prevKey: Failed " + err.Error())
