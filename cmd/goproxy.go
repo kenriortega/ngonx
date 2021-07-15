@@ -4,11 +4,10 @@ import (
 	"flag"
 	"runtime"
 
-	domain "github.com/kenriortega/goproxy/internal/proxy/domain"
-
 	"github.com/kenriortega/goproxy/cmd/cli"
 	"github.com/kenriortega/goproxy/internal/platform/config"
 	"github.com/kenriortega/goproxy/internal/platform/logger"
+	domain "github.com/kenriortega/goproxy/internal/proxy/domain"
 )
 
 var (

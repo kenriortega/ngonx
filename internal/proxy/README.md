@@ -11,6 +11,8 @@ ReverseProxy is an HTTP Handler that takes an incoming request and sends it to a
 TODO
 -----
 
+- add tls custom or let`s encrypt integration
+- add first unit testings
 - add observability loggin, metric, tracing
 - add Load balancer Round Robbin algoritm
 - add rate limit cache badgerdb and redis
