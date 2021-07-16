@@ -17,11 +17,17 @@ type Config struct {
 type ProxyGateway struct {
 	Host          string                 `mapstructure:"host_proxy"`
 	Port          int                    `mapstructure:"port_proxy"`
+	ProxySSL      ProxySSL               `mapstructure:"ssl_proxy"`
 	ProxySecurity ProxySecurity          `mapstructure:"security"`
 	ProxyCache    ProxyCache             `mapstructure:"cache_proxy"`
 	EnpointsProxy []domain.ProxyEndpoint `mapstructure:"services_proxy"`
 }
 
+type ProxySSL struct {
+	Enable  bool   `mapstructure:"enable"`
+	CrtFile string `mapstructure:"crt_file"`
+	KeyFile string `mapstructure:"key_file"`
+}
 type ProxySecurity struct {
 	Type string `mapstructure:"type"`
 }
