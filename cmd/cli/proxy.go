@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/kenriortega/goproxy/internal/platform/badgerdb"
+	"github.com/kenriortega/goproxy/internal/platform/config"
 	"github.com/kenriortega/goproxy/internal/platform/genkey"
 	"github.com/kenriortega/goproxy/internal/platform/logger"
 	domain "github.com/kenriortega/goproxy/internal/proxy/domain"
@@ -13,7 +14,13 @@ import (
 	services "github.com/kenriortega/goproxy/internal/proxy/services"
 )
 
-func Start(generateApiKey bool, endpoints []domain.ProxyEndpoint, host string, port int, engine, key, prevKey, securityType string) {
+func Start(
+	generateApiKey bool,
+	endpoints []domain.ProxyEndpoint,
+	host string,
+	port int,
+	engine, key, prevKey, securityType string,
+	sslProxy config.ProxySSL) {
 
 	var proxyRepository domain.ProxyRepository
 	clientBadger := badgerdb.GetBadgerDB(false)
@@ -44,16 +51,21 @@ func Start(generateApiKey bool, endpoints []domain.ProxyEndpoint, host string, p
 		h.ProxyGateway(endpoints, key, securityType)
 	}
 
-	server := &http.Server{
-		Handler: nil,
-		Addr:    fmt.Sprintf("%s:%d", host, port),
-		// Good practice: enforce timeouts for servers you create!
-		WriteTimeout: 15 * time.Second,
-		ReadTimeout:  15 * time.Second,
-	}
+	if sslProxy.Enable {
+		// TODO: enale ssl mode
+	} else {
 
-	logger.LogInfo(fmt.Sprintf("Proxy started at :%d\n", port))
-	if err := server.ListenAndServe(); err != nil {
-		logger.LogError(err.Error())
+		server := &http.Server{
+			Handler: nil,
+			Addr:    fmt.Sprintf("%s:%d", host, port),
+			// Good practice: enforce timeouts for servers you create!
+			WriteTimeout: 15 * time.Second,
+			ReadTimeout:  15 * time.Second,
+		}
+
+		logger.LogInfo(fmt.Sprintf("Proxy started at :%d\n", port))
+		if err := server.ListenAndServe(); err != nil {
+			logger.LogError(err.Error())
+		}
 	}
 }

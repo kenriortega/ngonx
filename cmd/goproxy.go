@@ -25,6 +25,7 @@ var (
 	key            = "secretKey"
 	securityType   = "none"
 	prevKey        = ""
+	sslProxy       config.ProxySSL
 )
 
 func init() {
@@ -41,6 +42,7 @@ func init() {
 	engine = configFromYaml.ProxyCache.Engine
 	securityType = configFromYaml.ProxySecurity.Type
 	key = configFromYaml.ProxyCache.Key + "_" + securityType
+	sslProxy = configFromYaml.ProxySSL
 	generateApiKey = false
 
 	numcpu := runtime.NumCPU()
@@ -69,6 +71,7 @@ func main() {
 			key,
 			prevKey,
 			securityType,
+			sslProxy,
 		)
 	}
 
