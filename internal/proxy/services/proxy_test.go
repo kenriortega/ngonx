@@ -10,7 +10,7 @@ import (
 var proxyRepository domain.ProxyRepository
 
 func Test_SaveSecretKEY(t *testing.T) {
-	clientBadger := badgerdb.GetBadgerDB(true)
+	clientBadger := badgerdb.GetBadgerDB(false)
 	proxyRepository = domain.NewProxyRepository(clientBadger)
 	err := proxyRepository.SaveKEY("badger", "key", "apikey")
 	if err != nil {
@@ -19,7 +19,7 @@ func Test_SaveSecretKEY(t *testing.T) {
 }
 
 func Test_GetKEY(t *testing.T) {
-	clientBadger := badgerdb.GetBadgerDB(true)
+	clientBadger := badgerdb.GetBadgerDB(false)
 	proxyRepository = domain.NewProxyRepository(clientBadger)
 	result, err := proxyRepository.GetKEY("key")
 	if err != nil {
