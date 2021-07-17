@@ -58,7 +58,9 @@ func (ph *ProxyHandler) ProxyGateway(endpoints domain.ProxyEndpoint, key, securi
 					err := checkJWTSecretKeyFromRequest(req, key)
 					proxy.ModifyResponse = modifyResponse(err)
 				case "apikey":
-					checkAPIKEYSecretKeyFromRequest(req, ph, key)
+
+					err := checkAPIKEYSecretKeyFromRequest(req, ph, key)
+					proxy.ModifyResponse = modifyResponse(err)
 				}
 
 			}
@@ -93,7 +95,7 @@ func (ph *ProxyHandler) ProxyGateway(endpoints domain.ProxyEndpoint, key, securi
 }
 
 func checkJWTSecretKeyFromRequest(req *http.Request, key string) error {
-	header := req.Header.Get("Authorization")
+	header := req.Header.Get("Authorization") // pass to constanst
 	hs := jwt.NewHS256([]byte(key))
 	now := time.Now()
 	if !strings.HasPrefix(header, "Bearer ") {
@@ -117,16 +119,19 @@ func checkJWTSecretKeyFromRequest(req *http.Request, key string) error {
 
 	return nil
 }
-func checkAPIKEYSecretKeyFromRequest(req *http.Request, ph *ProxyHandler, key string) {
+func checkAPIKEYSecretKeyFromRequest(req *http.Request, ph *ProxyHandler, key string) error {
+	// TODO: return custom error when failed verification api
 	apikey, err := ph.Service.GetKEY(key)
-	header := req.Header.Get("X-API-KEY")
+	header := req.Header.Get("X-API-KEY") // pass to constants
 	if err != nil {
 		logger.LogError(errors.ErrGetkeyView.Error())
 	}
 	if apikey == header {
 		logger.LogInfo("OK")
+		return nil
 	} else {
 		logger.LogInfo("Invalid apikey")
+		return errors.NewError("Invalid API KEY")
 	}
 }
 
