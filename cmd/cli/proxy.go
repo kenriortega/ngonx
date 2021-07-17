@@ -1,10 +1,6 @@
 package cli
 
 import (
-	"fmt"
-	"net/http"
-	"time"
-
 	"github.com/kenriortega/goproxy/internal/platform/badgerdb"
 	"github.com/kenriortega/goproxy/internal/platform/config"
 	"github.com/kenriortega/goproxy/internal/platform/genkey"
@@ -24,7 +20,6 @@ func StartProxy(
 	engine := config.ProxyCache.Engine
 	securityType := config.ProxySecurity.Type
 	key := config.ProxyCache.Key + "_" + securityType
-
 	var proxyRepository domain.ProxyRepository
 	clientBadger := badgerdb.GetBadgerDB(false)
 	proxyRepository = domain.NewProxyRepository(clientBadger)
@@ -54,17 +49,23 @@ func StartProxy(
 		h.ProxyGateway(endpoints, key, securityType)
 	}
 
-	server := &http.Server{
-		Handler: nil,
-		Addr:    fmt.Sprintf("%s:%d", config.ProxyGateway.Host, port),
-		// Good practice: enforce timeouts for servers you create!
-		WriteTimeout: 15 * time.Second,
-		ReadTimeout:  15 * time.Second,
-	}
-
-	logger.LogInfo(fmt.Sprintf("Proxy started at :%d\n", port))
-	if err := server.ListenAndServe(); err != nil {
-		logger.LogError(err.Error())
+	if config.ProxySSL.Enable {
+		portSSL := config.ProxyGateway.Port + config.ProxySSL.SSLPort
+		server := NewServerSSL(
+			config.ProxyGateway.Host,
+			portSSL,
+		)
+		server.StartSSL(
+			config.ProxySSL.CrtFile,
+			config.ProxySSL.KeyFile,
+		)
+	} else {
+		port = config.ProxyGateway.Port + port
+		server := NewServer(
+			config.ProxyGateway.Host,
+			port,
+		)
+		server.Start()
 	}
 
 }
