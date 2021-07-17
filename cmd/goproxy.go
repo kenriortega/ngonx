@@ -7,25 +7,18 @@ import (
 	"github.com/kenriortega/goproxy/cmd/cli"
 	"github.com/kenriortega/goproxy/internal/platform/config"
 	"github.com/kenriortega/goproxy/internal/platform/logger"
-	domain "github.com/kenriortega/goproxy/internal/proxy/domain"
 )
 
 var (
 	service        = "proxy"
 	configFromYaml config.Config
 	errConfig      error
-	endpoints      []domain.ProxyEndpoint
 	portProxy      int
-	host           string
 	generateApiKey = false
 	serverList     = ""
 	portLB         = 3030
 	setingFile     = "goproxy.yaml"
-	engine         = "badger"
-	key            = "secretKey"
-	securityType   = "none"
 	prevKey        = ""
-	sslProxy       config.ProxySSL
 )
 
 func init() {
@@ -36,15 +29,8 @@ func init() {
 		// create empty file yml
 		configFromYaml.CreateSettingFile(setingFile)
 	}
-	endpoints = configFromYaml.ProxyGateway.EnpointsProxy
-	portProxy = configFromYaml.ProxyGateway.Port
-	host = configFromYaml.ProxyGateway.Host
-	engine = configFromYaml.ProxyCache.Engine
-	securityType = configFromYaml.ProxySecurity.Type
-	key = configFromYaml.ProxyCache.Key + "_" + securityType
-	sslProxy = configFromYaml.ProxySSL
-	generateApiKey = false
 
+	generateApiKey = false
 	numcpu := runtime.NumCPU()
 	runtime.GOMAXPROCS(numcpu)
 }
@@ -62,16 +48,13 @@ func main() {
 	case "lb":
 		cli.StartLB(serverList, portLB)
 	case "proxy":
-		cli.Start(
+		portProxy = configFromYaml.ProxyGateway.Port + portProxy
+
+		cli.StartProxy(
 			generateApiKey,
-			endpoints,
-			host,
 			portProxy,
-			engine,
-			key,
 			prevKey,
-			securityType,
-			sslProxy,
+			configFromYaml,
 		)
 	}
 
