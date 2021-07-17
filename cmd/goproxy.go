@@ -48,7 +48,6 @@ func main() {
 	case "lb":
 		cli.StartLB(serverList, portLB)
 	case "proxy":
-		portProxy = configFromYaml.ProxyGateway.Port + portProxy
 
 		cli.StartProxy(
 			generateApiKey,

@@ -28,3 +28,7 @@ Authorization: Bearerx eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJCYW5rIiwi
 ###
 GET http://localhost:33999/version/
 X-API-KEY: 6d5cdc4a5e51f11da6561b8e02bcbe3e4979066c7f9e71e780f15e23dd0f34ee
+
+### SSL
+GET https://localhost:30443/version/
+X-API-KEY: 6d5cdc4a5e51f11da6561b8e02bcbe3e4979066c7f9e71e780f15e23dd0f34ee

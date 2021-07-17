@@ -25,6 +25,7 @@ type ProxyGateway struct {
 
 type ProxySSL struct {
 	Enable  bool   `mapstructure:"enable"`
+	SSLPort int    `mapstructure:"ssl_port"`
 	CrtFile string `mapstructure:"crt_file"`
 	KeyFile string `mapstructure:"key_file"`
 }
