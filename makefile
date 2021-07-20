@@ -4,3 +4,6 @@ build:
 
 app:
 	./goproxy
+
+gencert:
+	go run ./examples/tools/generate_cert.go
