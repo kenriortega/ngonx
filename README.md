@@ -60,6 +60,12 @@ make build
 go run  services/micro-a/api.go --port <port>
 ```
 
+> Start static files server
+
+```bash
+go run cmd/goproxy.go -type static
+```
+
 Install badger db on window if you don`t use CGO
 ```bash
 CGO_ENABLED=0 go get github.com/dgraph-io/badger/v3
@@ -70,7 +76,6 @@ CGO_ENABLED=0 go get github.com/dgraph-io/badger/v3
 ```sh
 # Key considerations for algorithm "RSA" ≥ 2048-bit
 openssl genrsa -out server.key 2048
-
 # Key considerations for algorithm "ECDSA" (X25519 || ≥ secp384r1)
 # https://safecurves.cr.yp.to/
 # List ECDSA the supported curves (openssl ecparam -list_curves)

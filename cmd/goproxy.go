@@ -48,13 +48,14 @@ func main() {
 	case "lb":
 		cli.StartLB(serverList, portLB)
 	case "proxy":
-
 		cli.StartProxy(
 			generateApiKey,
 			portProxy,
 			prevKey,
 			configFromYaml,
 		)
+	case "static":
+		cli.StartStaticServer(configFromYaml)
 	}
 
 }

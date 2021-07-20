@@ -12,18 +12,26 @@ import (
 
 type Config struct {
 	ProxyGateway `mapstructure:"proxy"`
+	StaticServer `mapstructure:"static_server"`
+}
+
+type StaticServer struct {
+	Host       string    `mapstructure:"host_server"`
+	Port       int       `mapstructure:"port_server"`
+	StaticFile string    `mapstructure:"static_files"`
+	ServerSSL  OptionSSL `mapstructure:"ssl_server"`
 }
 
 type ProxyGateway struct {
 	Host          string                 `mapstructure:"host_proxy"`
 	Port          int                    `mapstructure:"port_proxy"`
-	ProxySSL      ProxySSL               `mapstructure:"ssl_proxy"`
+	ProxySSL      OptionSSL              `mapstructure:"ssl_proxy"`
 	ProxySecurity ProxySecurity          `mapstructure:"security"`
 	ProxyCache    ProxyCache             `mapstructure:"cache_proxy"`
 	EnpointsProxy []domain.ProxyEndpoint `mapstructure:"services_proxy"`
 }
 
-type ProxySSL struct {
+type OptionSSL struct {
 	Enable  bool   `mapstructure:"enable"`
 	SSLPort int    `mapstructure:"ssl_port"`
 	CrtFile string `mapstructure:"crt_file"`
