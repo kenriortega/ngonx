@@ -84,7 +84,7 @@ chmod +x ./generate.sh
 
 ## Generate SSL (throug let`s encrypt)
 
-Check this post by [@acoronado](https://www.albertcoronado.com/2020/05/05/contratar-un-certificado-ssl-gratis-con-lets-encrypt-y-configurar-nginx/ "Contratar un certificado SSL Gratis con Let's Encrypt y configurar Nginx")
+Check this post ["Contratar un certificado SSL Gratis con Let's Encrypt y configurar Nginx"](https://www.albertcoronado.com/2020/05/05/contratar-un-certificado-ssl-gratis-con-lets-encrypt-y-configurar-nginx/ "Contratar un certificado SSL Gratis con Let's Encrypt y configurar Nginx") by @acoronado for more information.
 
 ```bash
 
