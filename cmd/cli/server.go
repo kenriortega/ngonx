@@ -17,9 +17,9 @@ type server struct {
 }
 
 func NewServer(host string, port int) *server {
-	mux := http.NewServeMux()
+
 	s := &http.Server{
-		Handler: mux,
+		Handler: nil,
 		Addr:    fmt.Sprintf("%s:%d", host, port),
 		// Good practice: enforce timeouts for servers you create!
 		WriteTimeout: 15 * time.Second,
@@ -41,9 +41,9 @@ func NewServerSSL(host string, port int) *server {
 			tls.TLS_RSA_WITH_AES_256_CBC_SHA,
 		},
 	}
-	mux := http.NewServeMux()
+
 	s := &http.Server{
-		Handler: mux,
+		Handler: nil,
 		Addr:    fmt.Sprintf("%s:%d", host, port),
 		// Good practice: enforce timeouts for servers you create!
 		WriteTimeout: 15 * time.Second,
