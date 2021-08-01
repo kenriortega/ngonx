@@ -10,11 +10,14 @@ import (
 	"github.com/spf13/viper"
 )
 
+// Config the main struct that define all elements
+// inside `goproxy.yaml`
 type Config struct {
 	ProxyGateway `mapstructure:"proxy"`
 	StaticServer `mapstructure:"static_server"`
 }
 
+// StaticServer struct for the static server obeject
 type StaticServer struct {
 	Host       string    `mapstructure:"host_server"`
 	Port       int       `mapstructure:"port_server"`
@@ -22,6 +25,7 @@ type StaticServer struct {
 	ServerSSL  OptionSSL `mapstructure:"ssl_server"`
 }
 
+// ProxyGateway struct for the proxy gateway object
 type ProxyGateway struct {
 	Host          string                 `mapstructure:"host_proxy"`
 	Port          int                    `mapstructure:"port_proxy"`
@@ -31,20 +35,26 @@ type ProxyGateway struct {
 	EnpointsProxy []domain.ProxyEndpoint `mapstructure:"services_proxy"`
 }
 
+// OptionSSL struct for the ssl options
 type OptionSSL struct {
 	Enable  bool   `mapstructure:"enable"`
 	SSLPort int    `mapstructure:"ssl_port"`
 	CrtFile string `mapstructure:"crt_file"`
 	KeyFile string `mapstructure:"key_file"`
 }
+
+// ProxySecurity struct for security object
 type ProxySecurity struct {
 	Type string `mapstructure:"type"`
 }
+
+// ProxyCache struct for cache options object
 type ProxyCache struct {
 	Engine string `mapstructure:"engine"`
 	Key    string `mapstructure:"key"`
 }
 
+// LoadConfig load the config file from `path` and `name`
 func LoadConfig(path, name string) (config Config, err error) {
 	viper.AddConfigPath(path)
 	viper.SetConfigName(name)
@@ -63,18 +73,33 @@ func LoadConfig(path, name string) (config Config, err error) {
 	return
 }
 
+// CreateSettingFile create a setting file if it doesn`t exits
 func (c *Config) CreateSettingFile(setingFile string) {
 	f, err := os.Create(fmt.Sprintf("./%s", setingFile))
-	ymldata := `
+	ymldata :=
+		`
+static_server:
+  host_server: 0.0.0.0
+  port_server: 8080
+  static_files: ./examples/dist
+  ssl_server:
+    enable: true
+    ssl_port: 8443
+    crt_file: ./key/cert.pem
+    key_file: ./key/key.pem
 proxy:
   host_proxy: 0.0.0.0
-  port_proxy: 5000
+  port_proxy: 30000
+  ssl_proxy:
+    enable: true
+    ssl_port: 443
+    crt_file: ./key/server.crt
+    key_file: ./key/server.key
   cache_proxy:
     engine: badger # local|badgerDB|redis
     key: secretKey
   security:
-    type: jwt # apikey|jwt|none
-    secret_key: key00 # apikey jwtkey this value can be replace by genkey command
+    type: apikey # apikey|jwt|none
   # maps of microservices with routes
   services_proxy:
       - name: microA
@@ -83,6 +108,10 @@ proxy:
           - path_endpoints: /api/v1/health/
             path_proxy: /health/
             path_protected: false
+
+          - path_endpoints: /api/v1/version/
+            path_proxy: /version/
+            path_protected: true
 `
 	if err != nil {
 		logger.LogError(errors.ErrCreatingSettingFile.Error())
