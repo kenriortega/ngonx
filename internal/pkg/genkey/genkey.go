@@ -11,6 +11,7 @@ import (
 )
 
 var (
+	// seededRand random number
 	seededRand *rand.Rand = rand.New(
 		rand.NewSource(time.Now().UnixNano()))
 )

@@ -4,6 +4,7 @@ import (
 	"testing"
 )
 
+// Test_genkey test for genkey command
 func Test_genkey(t *testing.T) {
 	word := "1q2w3e4r5t"
 	apiKey := ApiKeyGenerator(word)
