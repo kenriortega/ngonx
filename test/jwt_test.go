@@ -12,10 +12,12 @@ import (
 
 var hs = jwt.NewHS256([]byte("secret"))
 
+// JWTPayload struct for customs payload definition
 type JWTPayload struct {
 	jwt.Payload
 }
 
+// Test_jwt_sign test for sing & verification of JWT
 func Test_jwt_sign(t *testing.T) {
 	now := time.Now()
 	// Using ParseDuration() function
