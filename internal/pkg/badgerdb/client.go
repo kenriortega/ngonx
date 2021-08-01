@@ -5,13 +5,17 @@ import (
 	"github.com/kenriortega/goproxy/internal/pkg/logger"
 )
 
+var pathDB = "./badger.data"
+
+// GetBadgerDB return `*badger.DB`
+// this client provide GET and SAVE methods
 func GetBadgerDB(embedMem bool) *badger.DB {
 	var opt badger.Options
 	var clientBadger *badger.DB
 	if embedMem {
 		opt = badger.DefaultOptions("").WithInMemory(true).WithBypassLockGuard(true)
 	} else {
-		opt = badger.DefaultOptions("./badger.data").WithBypassLockGuard(true)
+		opt = badger.DefaultOptions(pathDB).WithBypassLockGuard(true)
 	}
 
 	db, err := badger.Open(opt)
