@@ -21,7 +21,7 @@ jobs:
           goos: ${{ matrix.goos }}
           goarch: ${{ matrix.goarch }}
           project_path: "./cmd/"
-          binary_name: "goproxy"
+          binary_name: "proxyctl"
           ldflags: "-s -w"
           # extra_files: LICENSE README.md
   releases-matrix-arm:
@@ -40,6 +40,6 @@ jobs:
             goos: ${{ matrix.goos }}
             goarch: ${{ matrix.goarch }}
             project_path: "./cmd/"
-            binary_name: "goproxy"
+            binary_name: "proxyctl"
             ldflags: "-s -w"
             # extra_files: LICENSE README.md
