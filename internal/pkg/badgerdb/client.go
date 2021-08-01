@@ -2,7 +2,7 @@ package badgerdb
 
 import (
 	badger "github.com/dgraph-io/badger/v3"
-	"github.com/kenriortega/goproxy/internal/platform/logger"
+	"github.com/kenriortega/goproxy/internal/pkg/logger"
 )
 
 func GetBadgerDB(embedMem bool) *badger.DB {

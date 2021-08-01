@@ -9,8 +9,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/kenriortega/goproxy/internal/platform/errors"
-	"github.com/kenriortega/goproxy/internal/platform/logger"
+	"github.com/kenriortega/goproxy/internal/pkg/errors"
+	"github.com/kenriortega/goproxy/internal/pkg/logger"
 )
 
 // Load Balancer data structures...

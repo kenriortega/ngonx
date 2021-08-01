@@ -1,7 +1,7 @@
 package proxy
 
 import (
-	"github.com/kenriortega/goproxy/internal/platform/badgerdb"
+	"github.com/kenriortega/goproxy/internal/pkg/badgerdb"
 	domain "github.com/kenriortega/goproxy/internal/proxy/domain"
 
 	"testing"

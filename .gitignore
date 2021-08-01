@@ -29,4 +29,5 @@ key/
 .env
 .vscode
 goproxy
+proxyctl
 badger.data

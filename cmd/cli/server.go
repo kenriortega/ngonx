@@ -9,7 +9,7 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/kenriortega/goproxy/internal/platform/logger"
+	"github.com/kenriortega/goproxy/internal/pkg/logger"
 )
 
 type server struct {

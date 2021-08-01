@@ -5,8 +5,8 @@ import (
 	"runtime"
 
 	"github.com/kenriortega/goproxy/cmd/cli"
-	"github.com/kenriortega/goproxy/internal/platform/config"
-	"github.com/kenriortega/goproxy/internal/platform/logger"
+	"github.com/kenriortega/goproxy/internal/pkg/config"
+	"github.com/kenriortega/goproxy/internal/pkg/logger"
 )
 
 var (

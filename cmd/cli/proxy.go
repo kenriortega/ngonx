@@ -1,10 +1,10 @@
 package cli
 
 import (
-	"github.com/kenriortega/goproxy/internal/platform/badgerdb"
-	"github.com/kenriortega/goproxy/internal/platform/config"
-	"github.com/kenriortega/goproxy/internal/platform/genkey"
-	"github.com/kenriortega/goproxy/internal/platform/logger"
+	"github.com/kenriortega/goproxy/internal/pkg/badgerdb"
+	"github.com/kenriortega/goproxy/internal/pkg/config"
+	"github.com/kenriortega/goproxy/internal/pkg/genkey"
+	"github.com/kenriortega/goproxy/internal/pkg/logger"
 	domain "github.com/kenriortega/goproxy/internal/proxy/domain"
 	handlers "github.com/kenriortega/goproxy/internal/proxy/handlers"
 	services "github.com/kenriortega/goproxy/internal/proxy/services"

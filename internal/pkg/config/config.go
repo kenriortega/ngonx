@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/kenriortega/goproxy/internal/platform/errors"
-	"github.com/kenriortega/goproxy/internal/platform/logger"
+	"github.com/kenriortega/goproxy/internal/pkg/errors"
+	"github.com/kenriortega/goproxy/internal/pkg/logger"
 	domain "github.com/kenriortega/goproxy/internal/proxy/domain"
 	"github.com/spf13/viper"
 )
