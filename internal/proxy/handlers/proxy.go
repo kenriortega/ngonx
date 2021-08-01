@@ -16,19 +16,26 @@ import (
 	services "github.com/kenriortega/goproxy/internal/proxy/services"
 )
 
+// proxy global var for management of reverse proxy
 var proxy *httputil.ReverseProxy
 
+// JWTPayload custom struc for jwt Payload
 type JWTPayload struct {
 	jwt.Payload
 }
+
+// ResponseMiddleware struct for middleware responses
 type ResponseMiddleware struct {
 	Message string `json:"message"`
 	Code    int    `json:"code"`
 }
+
+// ProxyHandler handler for proxy funcionalities
 type ProxyHandler struct {
 	Service services.DefaultProxyService
 }
 
+// SaveSecretKEY handler for save secrets
 func (ph *ProxyHandler) SaveSecretKEY(engine, key, apikey string) {
 	result, err := ph.Service.SaveSecretKEY(engine, key, apikey)
 	if err != nil {
@@ -37,6 +44,7 @@ func (ph *ProxyHandler) SaveSecretKEY(engine, key, apikey string) {
 	logger.LogInfo(result)
 }
 
+// ProxyGateway handler for management all request
 func (ph *ProxyHandler) ProxyGateway(endpoints domain.ProxyEndpoint, key, securityType string) {
 	for _, endpoint := range endpoints.Endpoints {
 
@@ -94,6 +102,7 @@ func (ph *ProxyHandler) ProxyGateway(endpoints domain.ProxyEndpoint, key, securi
 	}
 }
 
+// checkJWTSecretKeyFromRequest check jwt for request
 func checkJWTSecretKeyFromRequest(req *http.Request, key string) error {
 	header := req.Header.Get("Authorization") // pass to constanst
 	hs := jwt.NewHS256([]byte(key))
@@ -119,8 +128,9 @@ func checkJWTSecretKeyFromRequest(req *http.Request, key string) error {
 
 	return nil
 }
+
+// checkAPIKEYSecretKeyFromRequest check apikey from request
 func checkAPIKEYSecretKeyFromRequest(req *http.Request, ph *ProxyHandler, key string) error {
-	// TODO: return custom error when failed verification api
 	apikey, err := ph.Service.GetKEY(key)
 	header := req.Header.Get("X-API-KEY") // pass to constants
 	if err != nil {
@@ -135,6 +145,7 @@ func checkAPIKEYSecretKeyFromRequest(req *http.Request, ph *ProxyHandler, key st
 	}
 }
 
+// modifyResponse modify response
 func modifyResponse(err error) func(*http.Response) error {
 	return func(resp *http.Response) error {
 		resp.Header.Set("X-Proxy", "EgoProxy")

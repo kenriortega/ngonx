@@ -10,6 +10,7 @@ import (
 	domain "github.com/kenriortega/goproxy/internal/proxy/domain"
 )
 
+// ServerPool struct for server pool
 var ServerPool domain.ServerPool
 
 // GetAttemptsFromContext returns the attempts for request

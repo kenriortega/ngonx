@@ -9,10 +9,13 @@ import (
 	"github.com/kenriortega/goproxy/internal/pkg/logger"
 )
 
+// ProxyRepositoryStorage struct repository storage
 type ProxyRepositoryStorage struct {
 	clientBadger *badger.DB
 }
 
+// NewProxyRepository return a new ProxyRepositoryStorage
+// with a client `*badger.DB`
 func NewProxyRepository(clients ...interface{}) ProxyRepositoryStorage {
 	var proxyRepositoryDB ProxyRepositoryStorage
 	for _, c := range clients {
@@ -24,6 +27,7 @@ func NewProxyRepository(clients ...interface{}) ProxyRepositoryStorage {
 	return proxyRepositoryDB
 }
 
+// SaveKEY save a key on the database
 func (r ProxyRepositoryStorage) SaveKEY(engine, key, apikey string) error {
 	switch engine {
 	case "badger":
@@ -64,6 +68,7 @@ func (r ProxyRepositoryStorage) SaveKEY(engine, key, apikey string) error {
 	return nil
 }
 
+// GetKEY get key from the database
 func (r ProxyRepositoryStorage) GetKEY(key string) (string, error) {
 	var apikey string
 	fmt.Println(key)
