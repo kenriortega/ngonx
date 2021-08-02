@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/kenriortega/goproxy/internal/pkg/config"
+	"github.com/kenriortega/goproxy/pkg/config"
 )
 
 func StartStaticServer(

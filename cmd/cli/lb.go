@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kenriortega/goproxy/internal/pkg/logger"
+	"github.com/kenriortega/goproxy/pkg/logger"
 
 	domain "github.com/kenriortega/goproxy/internal/proxy/domain"
 

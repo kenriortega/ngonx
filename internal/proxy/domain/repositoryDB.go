@@ -5,8 +5,8 @@ import (
 	"os"
 
 	badger "github.com/dgraph-io/badger/v3"
-	"github.com/kenriortega/goproxy/internal/pkg/errors"
-	"github.com/kenriortega/goproxy/internal/pkg/logger"
+	"github.com/kenriortega/goproxy/pkg/errors"
+	"github.com/kenriortega/goproxy/pkg/logger"
 )
 
 // ProxyRepositoryStorage struct repository storage

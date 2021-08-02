@@ -2,7 +2,7 @@ package badgerdb
 
 import (
 	badger "github.com/dgraph-io/badger/v3"
-	"github.com/kenriortega/goproxy/internal/pkg/logger"
+	"github.com/kenriortega/goproxy/pkg/logger"
 )
 
 var pathDB = "./badger.data"

@@ -6,8 +6,8 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/kenriortega/goproxy/internal/pkg/errors"
-	"github.com/kenriortega/goproxy/internal/pkg/logger"
+	"github.com/kenriortega/goproxy/pkg/errors"
+	"github.com/kenriortega/goproxy/pkg/logger"
 )
 
 var (
