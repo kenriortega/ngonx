@@ -74,7 +74,8 @@ func (ph *ProxyHandler) ProxyGateway(endpoints domain.ProxyEndpoint, key, securi
 			}
 			proxy.ErrorHandler = func(rw http.ResponseWriter, r *http.Request, err error) {
 				rw.WriteHeader(http.StatusInternalServerError)
-				rw.Write([]byte(err.Error()))
+				// Mark here if you don't care about the error
+				_, _ = rw.Write([]byte(err.Error()))
 			}
 			http.Handle(
 				endpoint.PathToProxy,

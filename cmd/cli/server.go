@@ -36,9 +36,10 @@ func NewServerSSL(host string, port int) *server {
 		PreferServerCipherSuites: true,
 		CipherSuites: []uint16{
 			tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
-			tls.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
-			tls.TLS_RSA_WITH_AES_256_GCM_SHA384,
-			tls.TLS_RSA_WITH_AES_256_CBC_SHA,
+			// This cypher suites are unsafe
+			// tls.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
+			// tls.TLS_RSA_WITH_AES_256_GCM_SHA384,
+			// tls.TLS_RSA_WITH_AES_256_CBC_SHA,
 		},
 	}
 
@@ -50,7 +51,7 @@ func NewServerSSL(host string, port int) *server {
 		ReadTimeout:  15 * time.Second,
 		IdleTimeout:  15 * time.Second,
 		TLSConfig:    cfg,
-		TLSNextProto: make(map[string]func(*http.Server, *tls.Conn, http.Handler), 0),
+		TLSNextProto: make(map[string]func(*http.Server, *tls.Conn, http.Handler)),
 	}
 	return &server{s}
 }

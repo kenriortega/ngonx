@@ -36,11 +36,10 @@ func StartLB(serverList string, port int) {
 			logger.LogInfo(fmt.Sprintf("[%s] %s\n", serverUrl.Host, e.Error()))
 			retries := handlers.GetRetryFromContext(request)
 			if retries < 3 {
-				select {
-				case <-time.After(10 * time.Millisecond):
-					ctx := context.WithValue(request.Context(), domain.RETRY, retries+1)
-					proxy.ServeHTTP(writer, request.WithContext(ctx))
-				}
+				// It looks like this should be a
+				time.Sleep(10 * time.Millisecond)
+				ctx := context.WithValue(request.Context(), domain.RETRY, retries+1)
+				proxy.ServeHTTP(writer, request.WithContext(ctx))
 				return
 			}
 

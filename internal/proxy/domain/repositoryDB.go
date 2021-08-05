@@ -19,9 +19,9 @@ type ProxyRepositoryStorage struct {
 func NewProxyRepository(clients ...interface{}) ProxyRepositoryStorage {
 	var proxyRepositoryDB ProxyRepositoryStorage
 	for _, c := range clients {
-		switch c.(type) {
+		switch c := c.(type) {
 		case *badger.DB:
-			proxyRepositoryDB.clientBadger = c.(*badger.DB)
+			proxyRepositoryDB.clientBadger = c
 		}
 	}
 	return proxyRepositoryDB
