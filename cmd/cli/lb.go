@@ -10,12 +10,19 @@ import (
 	"strings"
 	"time"
 
+	"github.com/kenriortega/goproxy/pkg/backoff"
 	"github.com/kenriortega/goproxy/pkg/logger"
 
 	domain "github.com/kenriortega/goproxy/internal/proxy/domain"
 
 	handlers "github.com/kenriortega/goproxy/internal/proxy/handlers"
 )
+
+// MaxJitter will randomize over the full exponential backoff time
+const MaxJitter = 1.0
+
+// NoJitter disables the use of jitter for randomizing the exponential backoff time
+const NoJitter = 0.0
 
 func StartLB(serverList string, port int) {
 
@@ -35,11 +42,13 @@ func StartLB(serverList string, port int) {
 		proxy.ErrorHandler = func(writer http.ResponseWriter, request *http.Request, e error) {
 			logger.LogInfo(fmt.Sprintf("[%s] %s\n", serverUrl.Host, e.Error()))
 			retries := handlers.GetRetryFromContext(request)
+
 			if retries < 3 {
 				select {
-				case <-time.After(10 * time.Millisecond):
+				case <-time.After(backoff.Default.Duration(retries)):
 					ctx := context.WithValue(request.Context(), domain.RETRY, retries+1)
 					proxy.ServeHTTP(writer, request.WithContext(ctx))
+					// case <-time.After(10 * time.Millisecond):
 				}
 				return
 			}
