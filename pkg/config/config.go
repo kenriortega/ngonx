@@ -117,7 +117,7 @@ proxy:
 		logger.LogError(errors.ErrCreatingSettingFile.Error())
 	}
 
-	defer f.Close()
+	// defer f.Close()
 
 	data := []byte(ymldata)
 

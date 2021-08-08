@@ -12,6 +12,7 @@ import (
 
 var (
 	// seededRand random number
+	// #nosec
 	seededRand *rand.Rand = rand.New(
 		rand.NewSource(time.Now().UnixNano()))
 )

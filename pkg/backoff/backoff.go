@@ -31,6 +31,7 @@ func (b BackoffPolicy) Duration(n int) time.Duration {
 
 // jitter returns a random integer uniformly distributed in the range
 // [0.5 * millis .. 1.5 * millis]
+// #nosec
 func jitter(millis int) int {
 	if millis == 0 {
 		return 0
