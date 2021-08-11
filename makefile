@@ -6,6 +6,7 @@ version = $(shell git describe --tags --abbrev=0 || echo 'development')
 # Get current date
 current_time = $(shell date +"%Y-%m-%d:T%H:%M:%S")
 
+
 # Add linker flags
 linker_flags = '-s -X main.buildTime=${current_time} -X main.versionHash=${git_hash} -X main.version=${version}'
 
