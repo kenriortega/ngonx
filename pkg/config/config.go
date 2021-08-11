@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	domain "github.com/kenriortega/goproxy/internal/proxy/domain"
-	"github.com/kenriortega/goproxy/pkg/errors"
-	"github.com/kenriortega/goproxy/pkg/logger"
+	domain "github.com/kenriortega/ngonx/internal/proxy/domain"
+	"github.com/kenriortega/ngonx/pkg/errors"
+	"github.com/kenriortega/ngonx/pkg/logger"
 	"github.com/spf13/viper"
 )
 
@@ -117,7 +117,7 @@ proxy:
 		logger.LogError(errors.ErrCreatingSettingFile.Error())
 	}
 
-	defer f.Close()
+	// defer f.Close()
 
 	data := []byte(ymldata)
 

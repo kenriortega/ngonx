@@ -5,8 +5,8 @@ import (
 	"os"
 
 	badger "github.com/dgraph-io/badger/v3"
-	"github.com/kenriortega/goproxy/pkg/errors"
-	"github.com/kenriortega/goproxy/pkg/logger"
+	"github.com/kenriortega/ngonx/pkg/errors"
+	"github.com/kenriortega/ngonx/pkg/logger"
 )
 
 // ProxyRepositoryStorage struct repository storage
@@ -19,9 +19,9 @@ type ProxyRepositoryStorage struct {
 func NewProxyRepository(clients ...interface{}) ProxyRepositoryStorage {
 	var proxyRepositoryDB ProxyRepositoryStorage
 	for _, c := range clients {
-		switch c.(type) {
+		switch c := c.(type) {
 		case *badger.DB:
-			proxyRepositoryDB.clientBadger = c.(*badger.DB)
+			proxyRepositoryDB.clientBadger = c
 		}
 	}
 	return proxyRepositoryDB
@@ -53,7 +53,7 @@ func (r ProxyRepositoryStorage) SaveKEY(engine, key, apikey string) error {
 			return errors.ErrSavekeyCreateLocal
 		}
 
-		defer f.Close()
+		// defer f.Close()
 
 		data := []byte(fmt.Sprintf("%s:%s", key, apikey))
 

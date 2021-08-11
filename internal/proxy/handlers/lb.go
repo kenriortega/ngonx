@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"time"
 
-	domain "github.com/kenriortega/goproxy/internal/proxy/domain"
-	"github.com/kenriortega/goproxy/pkg/errors"
-	"github.com/kenriortega/goproxy/pkg/logger"
+	domain "github.com/kenriortega/ngonx/internal/proxy/domain"
+	"github.com/kenriortega/ngonx/pkg/errors"
+	"github.com/kenriortega/ngonx/pkg/logger"
 )
 
 // ServerPool struct for server pool

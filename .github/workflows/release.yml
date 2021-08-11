@@ -15,15 +15,21 @@ jobs:
         goarch: [amd64]
     steps:
       - uses: actions/checkout@v2
+
+      - name: Set BUILD_TIME env
+        run: echo BUILD_TIME=$(date --iso-8601=seconds) >> ${GITHUB_ENV}
+      - name: Set APP_VERSION env
+        run: echo APP_VERSION=$(basename ${GITHUB_REF}) >> ${GITHUB_ENV}
+
       - uses: wangyoucao577/go-release-action@v1.16
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           goos: ${{ matrix.goos }}
           goarch: ${{ matrix.goarch }}
           project_path: "./cmd/"
-          binary_name: "proxyctl"
-          ldflags: "-s -w"
-          # extra_files: LICENSE README.md
+          binary_name: "ngxctl"
+          ldflags: "-s -X main.buildTime=${env.BUILD_TIME} -X main.versionHash=${github.sha} -X main.version=${env.APP_VERSION}"
+
   releases-matrix-arm:
       name: Release Go Binary
       runs-on: ubuntu-latest
@@ -34,12 +40,17 @@ jobs:
           goarch: [arm]
       steps:
         - uses: actions/checkout@v2
+
+        - name: Set BUILD_TIME env
+          run: echo BUILD_TIME=$(date --iso-8601=seconds) >> ${GITHUB_ENV}
+        - name: Set APP_VERSION env
+          run: echo APP_VERSION=$(basename ${GITHUB_REF}) >> ${GITHUB_ENV}
+        
         - uses: wangyoucao577/go-release-action@v1.16
           with:
             github_token: ${{ secrets.GITHUB_TOKEN }}
             goos: ${{ matrix.goos }}
             goarch: ${{ matrix.goarch }}
             project_path: "./cmd/"
-            binary_name: "proxyctl"
-            ldflags: "-s -w"
-            # extra_files: LICENSE README.md
+            binary_name: "ngxctl"
+            ldflags: "-s -X main.buildTime=${env.BUILD_TIME} -X main.versionHash=${github.sha} -X main.version=${env.APP_VERSION}"

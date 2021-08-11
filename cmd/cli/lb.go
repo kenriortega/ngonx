@@ -10,12 +10,19 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kenriortega/goproxy/pkg/logger"
+	"github.com/kenriortega/ngonx/pkg/backoff"
+	"github.com/kenriortega/ngonx/pkg/logger"
 
-	domain "github.com/kenriortega/goproxy/internal/proxy/domain"
+	domain "github.com/kenriortega/ngonx/internal/proxy/domain"
 
-	handlers "github.com/kenriortega/goproxy/internal/proxy/handlers"
+	handlers "github.com/kenriortega/ngonx/internal/proxy/handlers"
 )
+
+// MaxJitter will randomize over the full exponential backoff time
+const MaxJitter = 1.0
+
+// NoJitter disables the use of jitter for randomizing the exponential backoff time
+const NoJitter = 0.0
 
 func StartLB(serverList string, port int) {
 
@@ -34,13 +41,13 @@ func StartLB(serverList string, port int) {
 		proxy := httputil.NewSingleHostReverseProxy(serverUrl)
 		proxy.ErrorHandler = func(writer http.ResponseWriter, request *http.Request, e error) {
 			logger.LogInfo(fmt.Sprintf("[%s] %s\n", serverUrl.Host, e.Error()))
-			retries := handlers.GetRetryFromContext(request)
-			if retries < 3 {
-				select {
-				case <-time.After(10 * time.Millisecond):
-					ctx := context.WithValue(request.Context(), domain.RETRY, retries+1)
-					proxy.ServeHTTP(writer, request.WithContext(ctx))
-				}
+			retry := handlers.GetRetryFromContext(request)
+
+			if retry < 3 {
+				time.Sleep(backoff.Default.Duration(retry))
+				ctx := context.WithValue(request.Context(), domain.RETRY, retry+1)
+				proxy.ServeHTTP(writer, request.WithContext(ctx))
+
 				return
 			}
 

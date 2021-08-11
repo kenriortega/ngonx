@@ -1,0 +1,20 @@
+name: Scan our code with Run Gosec
+on:
+  push:
+    branches:
+      - development
+  pull_request:
+    branches:
+      - development
+jobs:
+  scan-code:
+    runs-on: ubuntu-latest
+    env:
+      GO111MODULE: on
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v2
+      - name: Scan our code with Run Gosec Security Scanner
+        uses: securego/gosec@master
+        with:
+          args: ./...

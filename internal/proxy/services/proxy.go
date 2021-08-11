@@ -1,7 +1,7 @@
 package proxy
 
 import (
-	domain "github.com/kenriortega/goproxy/internal/proxy/domain"
+	domain "github.com/kenriortega/ngonx/internal/proxy/domain"
 )
 
 // ProxyService interface service for proxy repository funcionalities

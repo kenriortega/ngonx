@@ -1,13 +1,13 @@
 package cli
 
 import (
-	domain "github.com/kenriortega/goproxy/internal/proxy/domain"
-	handlers "github.com/kenriortega/goproxy/internal/proxy/handlers"
-	services "github.com/kenriortega/goproxy/internal/proxy/services"
-	"github.com/kenriortega/goproxy/pkg/badgerdb"
-	"github.com/kenriortega/goproxy/pkg/config"
-	"github.com/kenriortega/goproxy/pkg/genkey"
-	"github.com/kenriortega/goproxy/pkg/logger"
+	domain "github.com/kenriortega/ngonx/internal/proxy/domain"
+	handlers "github.com/kenriortega/ngonx/internal/proxy/handlers"
+	services "github.com/kenriortega/ngonx/internal/proxy/services"
+	"github.com/kenriortega/ngonx/pkg/badgerdb"
+	"github.com/kenriortega/ngonx/pkg/config"
+	"github.com/kenriortega/ngonx/pkg/genkey"
+	"github.com/kenriortega/ngonx/pkg/logger"
 )
 
 func StartProxy(
