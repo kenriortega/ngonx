@@ -14,8 +14,8 @@ linker_flags = '-s -X main.buildTime=${current_time} -X main.versionHash=${git_h
 compile:
 	@echo "Building binaries..."
 
-	GOOS=linux GOARCH=amd64 go build -ldflags=${linker_flags} -o ./build/proxyctl-${version}-linux-amd64 cmd/goproxy.go
-	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags=${linker_flags} -o ./build/proxyctl-${version}-windows-amd64.exe cmd/goproxy.go
+	GOOS=linux GOARCH=amd64 go build -ldflags=${linker_flags} -o ./build/ngxctl-${version}-linux-amd64 cmd/main.go
+	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags=${linker_flags} -o ./build/ngxctl-${version}-windows-amd64.exe cmd/main.go
 
 gocert:
 	go run ./examples/tools/generate_cert.go

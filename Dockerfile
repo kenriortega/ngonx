@@ -8,7 +8,7 @@ RUN mkdir /app
 ADD . /app
 WORKDIR /app
 ## We want to build our application's binary executable
-RUN CGO_ENABLED=0 GOOS=linux go build -o goproxy ./cmd/
+RUN CGO_ENABLED=0 GOOS=linux go build -o ngonx ./cmd/
 
 ## the lightweight scratch image we'll
 ## run our application within
@@ -18,4 +18,4 @@ FROM alpine:latest AS production
 COPY --from=builder /app .
 ## we can then kick off our newly compiled
 ## binary exectuable!!
-CMD ["./goproxy"]
+CMD ["./ngonx"]

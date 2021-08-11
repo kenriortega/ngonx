@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/gbrlsnchs/jwt/v3"
-	"github.com/kenriortega/goproxy/pkg/errors"
-	"github.com/kenriortega/goproxy/pkg/logger"
+	"github.com/kenriortega/ngonx/pkg/errors"
+	"github.com/kenriortega/ngonx/pkg/logger"
 )
 
 var hs = jwt.NewHS256([]byte("secret"))

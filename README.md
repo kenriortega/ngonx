@@ -1,4 +1,4 @@
-# GOproxy
+# Ngonx
 PoC for learning how work proxy and load balancer like nginx server
 
 
@@ -7,7 +7,7 @@ PoC for learning how work proxy and load balancer like nginx server
 > Build
 
 ```bash
-make build
+make compile
 ```
 
 > List of command available
@@ -18,9 +18,9 @@ make build
         Load balanced backends, use commas to separate
   -genkey
         Action for generate hash for protected routes
-  -portLB int
+  -lbPort int
         Port to serve to run load balancing (default 3030)
-  -portProxy int
+  -proxyPort int
         Port to serve to run proxy (default 5000)
   -prevkey string
         Action for save a previous hash for protected routes to validate JWT

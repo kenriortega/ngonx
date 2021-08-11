@@ -8,12 +8,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kenriortega/goproxy/pkg/errors"
-	"github.com/kenriortega/goproxy/pkg/logger"
+	"github.com/kenriortega/ngonx/pkg/errors"
+	"github.com/kenriortega/ngonx/pkg/logger"
 
 	"github.com/gbrlsnchs/jwt/v3"
-	domain "github.com/kenriortega/goproxy/internal/proxy/domain"
-	services "github.com/kenriortega/goproxy/internal/proxy/services"
+	domain "github.com/kenriortega/ngonx/internal/proxy/domain"
+	services "github.com/kenriortega/ngonx/internal/proxy/services"
 )
 
 // proxy global var for management of reverse proxy

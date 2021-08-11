@@ -1,4 +1,4 @@
-module github.com/kenriortega/goproxy
+module github.com/kenriortega/ngonx
 
 go 1.16
 

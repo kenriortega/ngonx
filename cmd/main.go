@@ -6,50 +6,60 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/kenriortega/goproxy/cmd/cli"
-	"github.com/kenriortega/goproxy/pkg/config"
-	"github.com/kenriortega/goproxy/pkg/logger"
+	"github.com/kenriortega/ngonx/cmd/cli"
+	"github.com/kenriortega/ngonx/pkg/config"
+	"github.com/kenriortega/ngonx/pkg/logger"
 )
 
 var (
-	service        = "proxy"
-	buildTime      string
-	version        string
-	versionHash    string
-	configFromYaml config.Config
-	errConfig      error
-	portProxy      int
-	generateApiKey = false
-	serverList     = ""
-	portLB         = 3030
-	setingFile     = "goproxy.yaml"
-	prevKey        = ""
-	displayVersion = false
+	buildTime           string
+	version             string
+	versionHash         string
+	configFromYaml      config.Config
+	errConfig           error
+	portProxy           int
+	service             = "proxy"
+	setup               = false
+	generateApiKey      = false
+	serverList          = ""
+	portLB              = 3030
+	pathSettingsFile, _ = os.Getwd()
+	settingsFile        = "ngonx.yaml"
+	prevKey             = ""
+	displayVersion      = false
 )
 
 func init() {
-	configFromYaml, errConfig = config.LoadConfig(".", setingFile)
-	if errConfig != nil {
-		logger.LogError(errConfig.Error())
-		logger.LogInfo("config: Creating setting file by default")
-		// create empty file yml
-		configFromYaml.CreateSettingFile(setingFile)
-	}
 
-	generateApiKey = false
+	flag.BoolVar(&displayVersion, "version", displayVersion, "Display version and exit")
+	flag.BoolVar(&setup, "setup", setup, "Create yaml file configuration")
+	flag.StringVar(&pathSettingsFile, "configPath", pathSettingsFile, "Config path only not filename.yaml")
+	flag.StringVar(&settingsFile, "configFile", settingsFile, "Only config filename.yaml default gema.yaml")
+	flag.StringVar(&service, "type", service, "Main Service default is proxy")
+	flag.IntVar(&portProxy, "proxyPort", portProxy, "Port to serve to run proxy")
+	flag.BoolVar(&generateApiKey, "genkey", generateApiKey, "Action for generate hash for protected routes")
+	flag.StringVar(&prevKey, "prevkey", prevKey, "Action for save a previous hash for protected routes to validate JWT")
+	flag.StringVar(&serverList, "backends", serverList, "Load balanced backends, use commas to separate")
+	flag.IntVar(&portLB, "lbPort", portLB, "Port to serve to run load balancing")
+	flag.Parse()
+
 	numcpu := runtime.NumCPU()
 	runtime.GOMAXPROCS(numcpu)
 }
 
 func main() {
-	flag.BoolVar(&displayVersion, "version", displayVersion, "Display version and exit")
-	flag.StringVar(&service, "type", service, "Main Service default is proxy")
-	flag.IntVar(&portProxy, "portProxy", portProxy, "Port to serve to run proxy")
-	flag.BoolVar(&generateApiKey, "genkey", generateApiKey, "Action for generate hash for protected routes")
-	flag.StringVar(&prevKey, "prevkey", prevKey, "Action for save a previous hash for protected routes to validate JWT")
-	flag.StringVar(&serverList, "backends", serverList, "Load balanced backends, use commas to separate")
-	flag.IntVar(&portLB, "portLB", portLB, "Port to serve to run load balancing")
-	flag.Parse()
+
+	if setup {
+		logger.LogInfo("config: Creating setting file by default")
+		configFromYaml.CreateSettingFile(settingsFile)
+		os.Exit(0)
+	} else {
+		configFromYaml, errConfig = config.LoadConfig(pathSettingsFile, settingsFile)
+
+		if errConfig != nil {
+			logger.LogError("Yaml file not found please run command setup " + errConfig.Error())
+		}
+	}
 
 	if displayVersion {
 		fmt.Printf("Version:\t%s\n", version)

@@ -10,12 +10,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kenriortega/goproxy/pkg/backoff"
-	"github.com/kenriortega/goproxy/pkg/logger"
+	"github.com/kenriortega/ngonx/pkg/backoff"
+	"github.com/kenriortega/ngonx/pkg/logger"
 
-	domain "github.com/kenriortega/goproxy/internal/proxy/domain"
+	domain "github.com/kenriortega/ngonx/internal/proxy/domain"
 
-	handlers "github.com/kenriortega/goproxy/internal/proxy/handlers"
+	handlers "github.com/kenriortega/ngonx/internal/proxy/handlers"
 )
 
 // MaxJitter will randomize over the full exponential backoff time
