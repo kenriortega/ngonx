@@ -27,8 +27,8 @@ jobs:
           goos: ${{ matrix.goos }}
           goarch: ${{ matrix.goarch }}
           project_path: "./cmd/"
-          binary_name: "ngxctl"
-          ldflags: "-s -X main.buildTime=${env.BUILD_TIME} -X main.versionHash=${github.sha} -X main.version=${env.APP_VERSION}"
+          binary_name: "ngxctl-${{ env.APP_VERSION }}-${{ matrix.goos }}-${{ matrix.goarch }}"
+          ldflags: "-s -X main.buildTime=${{env.BUILD_TIME}} -X main.versionHash=${{github.sha}} -X main.version=${{env.APP_VERSION}}"
 
   releases-matrix-arm:
       name: Release Go Binary
@@ -52,5 +52,5 @@ jobs:
             goos: ${{ matrix.goos }}
             goarch: ${{ matrix.goarch }}
             project_path: "./cmd/"
-            binary_name: "ngxctl"
-            ldflags: "-s -X main.buildTime=${env.BUILD_TIME} -X main.versionHash=${github.sha} -X main.version=${env.APP_VERSION}"
+            binary_name: "ngxctl-${{ env.APP_VERSION }}-${{ matrix.goos }}-${{ matrix.goarch }}"
+            ldflags: "-s -X main.buildTime=${{env.BUILD_TIME}} -X main.versionHash=${{github.sha}} -X main.version=${{env.APP_VERSION}}"
