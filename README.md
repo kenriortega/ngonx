@@ -1,8 +1,10 @@
 # Ngonx
-PoC for learning how work proxy and load balancer like nginx server
+
+It`s a simple proxy server written with go.
+The core services are based on [nginx](https://github.com/nginx) server, and [traefik](https://github.com/traefik/traefik)
 
 
-## GOproxy command
+## ngonx commands
 
 > Build
 
@@ -13,19 +15,26 @@ make compile
 > List of command available
 
 ```bash
-
   -backends string
         Load balanced backends, use commas to separate
+  -configFile string
+        Only config filename.yaml default gema.yaml (default "ngonx.yaml")
+  -configPath string
+        Config path only not filename.yaml (default "pwd")
   -genkey
         Action for generate hash for protected routes
   -lbPort int
         Port to serve to run load balancing (default 3030)
-  -proxyPort int
-        Port to serve to run proxy (default 5000)
   -prevkey string
         Action for save a previous hash for protected routes to validate JWT
+  -proxyPort int
+        Port to serve to run proxy
+  -setup
+        Create yaml file configuration
   -type string
         Main Service default is proxy (default "proxy")
+  -version
+        Display version and exit
 ```
 
 > Start Proxy server first time 
@@ -33,25 +42,25 @@ make compile
 `genkey` command in true generate random secretkey and save on badgerdb on `badger.data`
 
 ```bash
-./goproxy -portProxy 5000 -genkey true
+./ngxctl -proxyPort 5000 -genkey true
 ```
 
 `prevkey` command receive a custom secretkey and save this on badgerdb on `badger.data`
 
 ```bash
-./goproxy -portProxy 5000 -prevkey <secretKey>
+./ngxctl -proxyPort 5000 -prevkey <secretKey>
 ```
 
 > Start Proxy server
 
 ```bash
-./goproxy -portProxy 5001
+./ngxctl -proxyPort 5001
 ```
 
 > Start load balancer
 
 ```bash
-./goproxy -type lb --backends "http://localhost:5000,http://localhost:5001,http://localhost:5002"
+./ngxctl -type lb --backends "http://localhost:5000,http://localhost:5001,http://localhost:5002"
 ```
 
 > Start API PoC service
@@ -63,7 +72,7 @@ go run  services/micro-a/api.go --port <port>
 > Start static files server
 
 ```bash
-go run cmd/goproxy.go -type static
+go run cmd/main.go -type static
 ```
 
 Install badger db on window if you don`t use CGO
