@@ -28,7 +28,7 @@ jobs:
           goarch: ${{ matrix.goarch }}
           project_path: "./cmd/"
           binary_name: "proxyctl"
-          ldflags: "-s -X main.buildTime=${env.BUILD_TIME} -X main.versionHash=${env.APP_VERSION} -X main.version=${env.APP_VERSION}"
+          ldflags: "-s -X main.buildTime=${env.BUILD_TIME} -X main.versionHash=${github.sha} -X main.version=${env.APP_VERSION}"
 
   releases-matrix-arm:
       name: Release Go Binary
@@ -53,4 +53,4 @@ jobs:
             goarch: ${{ matrix.goarch }}
             project_path: "./cmd/"
             binary_name: "proxyctl"
-            ldflags: "-s -X main.buildTime=${env.BUILD_TIME} -X main.versionHash=${env.APP_VERSION} -X main.version=${env.APP_VERSION}"
+            ldflags: "-s -X main.buildTime=${env.BUILD_TIME} -X main.versionHash=${github.sha} -X main.version=${env.APP_VERSION}"
