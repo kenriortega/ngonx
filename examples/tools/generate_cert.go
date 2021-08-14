@@ -240,7 +240,7 @@ func main() {
 
 	}
 
-	certOut, err := os.Create("./key/cert.pem")
+	certOut, err := os.Create("./ssl/cert.pem")
 
 	if err != nil {
 
@@ -262,7 +262,7 @@ func main() {
 
 	log.Print("wrote cert.pem\n")
 
-	keyOut, err := os.OpenFile("./key/key.pem", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	keyOut, err := os.OpenFile("./ssl/key.pem", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 
 	if err != nil {
 
