@@ -9,6 +9,7 @@ import (
 	"github.com/kenriortega/ngonx/cmd/cli"
 	"github.com/kenriortega/ngonx/pkg/config"
 	"github.com/kenriortega/ngonx/pkg/logger"
+	"github.com/kenriortega/ngonx/pkg/metric"
 )
 
 var (
@@ -27,6 +28,7 @@ var (
 	settingsFile        = "ngonx.yaml"
 	prevKey             = ""
 	displayVersion      = false
+	portExporterProxy   = 10000
 )
 
 func init() {
@@ -41,6 +43,7 @@ func init() {
 	flag.StringVar(&prevKey, "prevkey", prevKey, "Action for save a previous hash for protected routes to validate JWT")
 	flag.StringVar(&serverList, "backends", serverList, "Load balanced backends, use commas to separate")
 	flag.IntVar(&portLB, "lbPort", portLB, "Port to serve to run load balancing default 3030")
+	flag.IntVar(&portExporterProxy, "portExporter", portExporterProxy, "Port to serve expose metrics from prometheus default 10000")
 	flag.Parse()
 
 	numcpu := runtime.NumCPU()
@@ -67,6 +70,8 @@ func main() {
 		fmt.Printf("Build time:\t%s\n", buildTime)
 		os.Exit(0)
 	}
+	// Exporter Metrics
+	go metric.ExposeMetricServer(portExporterProxy)
 
 	switch service {
 	case "lb":
