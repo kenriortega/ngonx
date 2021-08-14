@@ -2,7 +2,8 @@
 git_hash := $(shell git rev-parse --short HEAD || echo 'development')
 
 # project version
-version = $(shell git describe --tags --abbrev=0 || echo 'development')
+# version = $(shell git describe --tags --abbrev=0 || echo 'development')
+version = $(shell git tag | sort -V | tail -1 || echo 'development')
 # Get current date
 current_time = $(shell date +"%Y-%m-%d:T%H:%M:%S")
 
@@ -20,3 +21,6 @@ compile:
 
 gocert:
 	go run ./examples/tools/generate_cert.go
+
+gossl:
+	./ssl/generate.sh
