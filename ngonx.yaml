@@ -5,16 +5,17 @@ static_server:
   ssl_server:
     enable: true
     ssl_port: 8443
-    crt_file: ./key/cert.pem
-    key_file: ./key/key.pem
+    crt_file: ./ssl/cert.pem
+    key_file: ./ssl/key.pem
 proxy:
   host_proxy: 0.0.0.0
   port_proxy: 30000
+  port_exporter_proxy: 10000
   ssl_proxy:
     enable: true
     ssl_port: 443
-    crt_file: ./key/server.crt
-    key_file: ./key/server.key
+    crt_file: ./ssl/cert.pem
+    key_file: ./ssl/key.pem
   cache_proxy:
     engine: badger # local|badgerDB|redis
     key: secretKey

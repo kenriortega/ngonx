@@ -31,3 +31,8 @@ key/
 goproxy
 proxyctl
 badger.data
+build
+*.crt
+*.key
+*.pem
+*.csr

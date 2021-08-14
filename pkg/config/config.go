@@ -27,12 +27,13 @@ type StaticServer struct {
 
 // ProxyGateway struct for the proxy gateway object
 type ProxyGateway struct {
-	Host          string                 `mapstructure:"host_proxy"`
-	Port          int                    `mapstructure:"port_proxy"`
-	ProxySSL      OptionSSL              `mapstructure:"ssl_proxy"`
-	ProxySecurity ProxySecurity          `mapstructure:"security"`
-	ProxyCache    ProxyCache             `mapstructure:"cache_proxy"`
-	EnpointsProxy []domain.ProxyEndpoint `mapstructure:"services_proxy"`
+	Host              string                 `mapstructure:"host_proxy"`
+	Port              int                    `mapstructure:"port_proxy"`
+	PortExporterProxy int                    `mapstructure:"port_exporter_proxy"`
+	ProxySSL          OptionSSL              `mapstructure:"ssl_proxy"`
+	ProxySecurity     ProxySecurity          `mapstructure:"security"`
+	ProxyCache        ProxyCache             `mapstructure:"cache_proxy"`
+	EnpointsProxy     []domain.ProxyEndpoint `mapstructure:"services_proxy"`
 }
 
 // OptionSSL struct for the ssl options
@@ -90,6 +91,7 @@ static_server:
 proxy:
   host_proxy: 0.0.0.0
   port_proxy: 30000
+  port_exporter_proxy: 10000
   ssl_proxy:
     enable: true
     ssl_port: 443
