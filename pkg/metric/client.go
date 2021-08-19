@@ -20,10 +20,23 @@ var (
 			"path",
 		},
 	)
+	CountersByEndpoint = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Name: "counter_request_by_microservicio",
+			Help: "Register all call to the endpoints",
+		},
+		[]string{
+			"proxyPath",
+			"endpointPath",
+			"ipAddr",
+			"method",
+		},
+	)
 )
 
 func init() {
 	prometheus.MustRegister(CountersByRoute)
+	prometheus.MustRegister(CountersByEndpoint)
 }
 
 func ExposeMetricServer(configPort int) {
