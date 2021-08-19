@@ -20,6 +20,7 @@ func StartProxy(
 	engine := config.ProxyCache.Engine
 	securityType := config.ProxySecurity.Type
 	key := config.ProxyCache.Key + "_" + securityType
+
 	var proxyRepository domain.ProxyRepository
 	clientBadger := badgerdb.GetBadgerDB(false)
 	proxyRepository = domain.NewProxyRepository(clientBadger)
