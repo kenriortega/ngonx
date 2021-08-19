@@ -10,6 +10,8 @@ import (
 
 	"github.com/kenriortega/ngonx/pkg/errors"
 	"github.com/kenriortega/ngonx/pkg/logger"
+	"github.com/kenriortega/ngonx/pkg/metric"
+	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/gbrlsnchs/jwt/v3"
 	domain "github.com/kenriortega/ngonx/internal/proxy/domain"
@@ -60,7 +62,14 @@ func (ph *ProxyHandler) ProxyGateway(endpoints domain.ProxyEndpoint, key, securi
 			originalDirector := proxy.Director
 			proxy.Director = func(req *http.Request) {
 				originalDirector(req)
-
+				metric.CountersByEndpoint.With(
+					prometheus.Labels{
+						"proxyPath":    req.RequestURI,
+						"endpointPath": target.String(),
+						"ipAddr":       extractIpAddr(req),
+						"method":       req.Method,
+					},
+				).Inc()
 				switch securityType {
 				case "jwt":
 					err := checkJWTSecretKeyFromRequest(req, key)
@@ -90,6 +99,15 @@ func (ph *ProxyHandler) ProxyGateway(endpoints domain.ProxyEndpoint, key, securi
 			originalDirector := proxy.Director
 			proxy.Director = func(req *http.Request) {
 				originalDirector(req)
+				metric.CountersByEndpoint.With(
+					prometheus.Labels{
+						"proxyPath":    req.RequestURI,
+						"endpointPath": target.String(),
+						"ipAddr":       extractIpAddr(req),
+						"method":       req.Method,
+					},
+				).Inc()
+
 			}
 			http.Handle(
 				endpoint.PathToProxy,
@@ -154,4 +172,27 @@ func modifyResponse(err error) func(*http.Response) error {
 		}
 		return nil
 	}
+}
+
+func extractIpAddr(req *http.Request) string {
+	ipAddress := req.RemoteAddr
+	fwdAddress := req.Header.Get("X-Forwarded-For") // capitalisation doesn't matter
+	if fwdAddress != "" {
+		// Got X-Forwarded-For
+		ipAddress = fwdAddress // If it's a single IP, then awesome!
+
+		// If we got an array... grab the first IP
+		ips := strings.Split(fwdAddress, ", ")
+		if len(ips) > 1 {
+			ipAddress = ips[0]
+		}
+	}
+	remoteAddrToParse := ""
+	if strings.Contains(ipAddress, "[::1]") {
+		remoteAddrToParse = strings.Replace(ipAddress, "[::1]", "localhost", -1)
+		ipAddress = strings.Split(remoteAddrToParse, ":")[0]
+	} else {
+		ipAddress = strings.Split(ipAddress, ":")[0]
+	}
+	return ipAddress
 }
