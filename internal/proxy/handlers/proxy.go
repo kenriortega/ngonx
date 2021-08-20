@@ -62,20 +62,13 @@ func (ph *ProxyHandler) ProxyGateway(endpoints domain.ProxyEndpoint, key, securi
 			originalDirector := proxy.Director
 			proxy.Director = func(req *http.Request) {
 				originalDirector(req)
-				metric.CountersByEndpoint.With(
-					prometheus.Labels{
-						"proxyPath":    req.RequestURI,
-						"endpointPath": target.String(),
-						"ipAddr":       extractIpAddr(req),
-						"method":       req.Method,
-					},
-				).Inc()
+				metricRegister(req, target)
+
 				switch securityType {
 				case "jwt":
 					err := checkJWTSecretKeyFromRequest(req, key)
 					proxy.ModifyResponse = modifyResponse(err)
 				case "apikey":
-
 					err := checkAPIKEYSecretKeyFromRequest(req, ph, key)
 					proxy.ModifyResponse = modifyResponse(err)
 				}
@@ -99,14 +92,7 @@ func (ph *ProxyHandler) ProxyGateway(endpoints domain.ProxyEndpoint, key, securi
 			originalDirector := proxy.Director
 			proxy.Director = func(req *http.Request) {
 				originalDirector(req)
-				metric.CountersByEndpoint.With(
-					prometheus.Labels{
-						"proxyPath":    req.RequestURI,
-						"endpointPath": target.String(),
-						"ipAddr":       extractIpAddr(req),
-						"method":       req.Method,
-					},
-				).Inc()
+				metricRegister(req, target)
 
 			}
 			http.Handle(
@@ -118,6 +104,26 @@ func (ph *ProxyHandler) ProxyGateway(endpoints domain.ProxyEndpoint, key, securi
 			)
 		}
 	}
+}
+
+func metricRegister(req *http.Request, target *url.URL) {
+	timer := prometheus.NewTimer(metric.DurationHttpRequest.WithLabelValues(target.String()))
+	metric.CountersByEndpoint.With(
+		prometheus.Labels{
+			"proxyPath":    req.RequestURI,
+			"endpointPath": target.String(),
+			"ipAddr":       extractIpAddr(req),
+			"method":       req.Method,
+		},
+	).Inc()
+	metric.TotalRequests.With(
+		prometheus.Labels{
+			"path":    req.RequestURI,
+			"service": "proxy",
+		},
+	).Inc()
+
+	timer.ObserveDuration()
 }
 
 // checkJWTSecretKeyFromRequest check jwt for request
@@ -167,6 +173,7 @@ func checkAPIKEYSecretKeyFromRequest(req *http.Request, ph *ProxyHandler, key st
 func modifyResponse(err error) func(*http.Response) error {
 	return func(resp *http.Response) error {
 		resp.Header.Set("X-Proxy", "EgoProxy")
+
 		if err != nil {
 			return err
 		}
