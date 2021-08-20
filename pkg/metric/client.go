@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/kenriortega/ngonx/pkg/logger"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -39,7 +40,10 @@ var (
 )
 
 func init() {
-	prometheus.Register(DurationHttpRequest)
+	err := prometheus.Register(DurationHttpRequest)
+	if err != nil {
+		logger.LogError(err.Error())
+	}
 	prometheus.MustRegister(CountersByEndpoint)
 	prometheus.MustRegister(TotalRequests)
 }
