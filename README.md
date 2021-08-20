@@ -133,6 +133,10 @@ certbot renew
 
 ---
 
+Metrics
+-----------
+
+Currently ngonx used prometheus for metric collector. The main service `proxy` expose for port 10000 on route `/metrics`
 
 BenchMarking
 ------------
