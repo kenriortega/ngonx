@@ -16,11 +16,14 @@ linker_flags = '-s -X main.buildTime=${current_time} -X main.versionHash=${git_h
 compile:
 	@echo "Building binaries..."
 
-	GOOS=linux GOARCH=amd64 go build -ldflags=${linker_flags} -o ./build/ngxctl-${version}-linux-amd64 cmd/main.go
-	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags=${linker_flags} -o ./build/ngxctl-${version}-windows-amd64.exe cmd/main.go
+	GOOS=linux GOARCH=amd64 go build -ldflags=${linker_flags} -o ./build/ngonxctl-${version}-linux-amd64 cmd/main.go
+	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags=${linker_flags} -o ./build/ngonxctl-${version}-windows-amd64.exe cmd/main.go
 
 gocert:
 	go run ./examples/tools/generate_cert.go
 
 gossl:
 	./ssl/generate.sh
+
+compress:
+	./upx -9 -q ./build/ngonxctl-${version}-linux-amd64
