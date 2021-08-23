@@ -1,10 +1,12 @@
 package proxy
 
 import (
+	"context"
 	"fmt"
 	"os"
 
 	badger "github.com/dgraph-io/badger/v3"
+	"github.com/go-redis/redis/v8"
 	"github.com/kenriortega/ngonx/pkg/errors"
 	"github.com/kenriortega/ngonx/pkg/logger"
 )
@@ -12,6 +14,7 @@ import (
 // ProxyRepositoryStorage struct repository storage
 type ProxyRepositoryStorage struct {
 	clientBadger *badger.DB
+	clientRdb    *redis.Client
 }
 
 // NewProxyRepository return a new ProxyRepositoryStorage
@@ -22,6 +25,8 @@ func NewProxyRepository(clients ...interface{}) ProxyRepositoryStorage {
 		switch c := c.(type) {
 		case *badger.DB:
 			proxyRepositoryDB.clientBadger = c
+		case *redis.Client:
+			proxyRepositoryDB.clientRdb = c
 		}
 	}
 	return proxyRepositoryDB
@@ -45,6 +50,11 @@ func (r ProxyRepositoryStorage) SaveKEY(engine, key, apikey string) error {
 		}
 
 		return nil
+	case "redis":
+		if _, err := r.clientRdb.HSet(context.TODO(), key, apikey).Result(); err != nil {
+			logger.LogError(err.Error())
+		}
+		// r.clientRdb.Expire(context.TODO(), key, 24*time.Hour)
 	case "local":
 		f, err := os.Create("./apikey")
 
@@ -69,24 +79,33 @@ func (r ProxyRepositoryStorage) SaveKEY(engine, key, apikey string) error {
 }
 
 // GetKEY get key from the database
-func (r ProxyRepositoryStorage) GetKEY(key string) (string, error) {
+func (r ProxyRepositoryStorage) GetKEY(engine, key string) (string, error) {
 	var apikey string
-	fmt.Println(key)
-	if err := r.clientBadger.View(func(txn *badger.Txn) error {
-		item, err := txn.Get([]byte(key))
-		if err != nil {
-			return errors.ErrGetkeyTX
-		}
-		if err := item.Value(func(value []byte) error {
-			apikey = string(value)
+
+	switch engine {
+	case "badger":
+		if err := r.clientBadger.View(func(txn *badger.Txn) error {
+			item, err := txn.Get([]byte(key))
+			if err != nil {
+				return errors.ErrGetkeyTX
+			}
+			if err := item.Value(func(value []byte) error {
+				apikey = string(value)
+				return nil
+			}); err != nil {
+				return errors.ErrGetkeyValue
+			}
+
 			return nil
 		}); err != nil {
-			return errors.ErrGetkeyValue
+			return "", errors.ErrGetkeyView
 		}
-
-		return nil
-	}); err != nil {
-		return "", errors.ErrGetkeyView
+	case "redis":
+		value, err := r.clientRdb.Get(context.TODO(), key).Result()
+		if err == redis.Nil || err != nil {
+			return "", err
+		}
+		apikey = value
 	}
 
 	return apikey, nil

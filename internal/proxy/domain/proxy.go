@@ -17,5 +17,5 @@ type Endpoint struct {
 // ProxyRepository interface
 type ProxyRepository interface {
 	SaveKEY(string, string, string) error
-	GetKEY(string) (string, error)
+	GetKEY(string, string) (string, error)
 }
