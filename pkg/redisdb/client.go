@@ -2,7 +2,6 @@ package redisdb
 
 import (
 	"context"
-	"os"
 	"time"
 
 	"github.com/kenriortega/ngonx/pkg/logger"
@@ -10,11 +9,11 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
-func GetRedisDbClient() *redis.Client {
+func GetRedisDbClient(redisUri, redisPass string) *redis.Client {
 
 	clientInstance := redis.NewClient(&redis.Options{
-		Addr:         os.Getenv("REDIS_URI"),  // use default Addr
-		Password:     os.Getenv("REDIS_PASS"), // no password set
+		Addr:         redisUri,  // use default Addr
+		Password:     redisPass, // no password set
 		DB:           0,
 		DialTimeout:  60 * time.Second,
 		ReadTimeout:  60 * time.Second,
