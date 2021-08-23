@@ -47,7 +47,7 @@ func (ph *ProxyHandler) SaveSecretKEY(engine, key, apikey string) {
 }
 
 // ProxyGateway handler for management all request
-func (ph *ProxyHandler) ProxyGateway(endpoints domain.ProxyEndpoint, key, securityType string) {
+func (ph *ProxyHandler) ProxyGateway(endpoints domain.ProxyEndpoint, engine, key, securityType string) {
 	for _, endpoint := range endpoints.Endpoints {
 
 		target, err := url.Parse(
@@ -69,7 +69,7 @@ func (ph *ProxyHandler) ProxyGateway(endpoints domain.ProxyEndpoint, key, securi
 					err := checkJWTSecretKeyFromRequest(req, key)
 					proxy.ModifyResponse = modifyResponse(err)
 				case "apikey":
-					err := checkAPIKEYSecretKeyFromRequest(req, ph, key)
+					err := checkAPIKEYSecretKeyFromRequest(req, ph, engine, key)
 					proxy.ModifyResponse = modifyResponse(err)
 				}
 
@@ -154,8 +154,8 @@ func checkJWTSecretKeyFromRequest(req *http.Request, key string) error {
 }
 
 // checkAPIKEYSecretKeyFromRequest check apikey from request
-func checkAPIKEYSecretKeyFromRequest(req *http.Request, ph *ProxyHandler, key string) error {
-	apikey, err := ph.Service.GetKEY(key)
+func checkAPIKEYSecretKeyFromRequest(req *http.Request, ph *ProxyHandler, engine, key string) error {
+	apikey, err := ph.Service.GetKEY(engine, key)
 	header := req.Header.Get("X-API-KEY") // pass to constants
 	if err != nil {
 		logger.LogError(errors.ErrGetkeyView.Error())

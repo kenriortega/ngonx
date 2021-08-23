@@ -21,7 +21,7 @@ func Test_SaveSecretKEY(t *testing.T) {
 func Test_GetKEY(t *testing.T) {
 	clientBadger := badgerdb.GetBadgerDB(false)
 	proxyRepository = domain.NewProxyRepository(clientBadger)
-	result, err := proxyRepository.GetKEY("key")
+	result, err := proxyRepository.GetKEY("badger", "key")
 	if err != nil {
 		t.Error("Error to created key")
 	}

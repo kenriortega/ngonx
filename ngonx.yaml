@@ -17,7 +17,7 @@ proxy:
     crt_file: ./ssl/cert.pem
     key_file: ./ssl/key.pem
   cache_proxy:
-    engine: badger # local|badgerDB|redis
+    engine: badger # badgerDB|redis
     key: secretKey
   security:
     type: apikey # apikey|jwt|none

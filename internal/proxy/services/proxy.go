@@ -7,7 +7,7 @@ import (
 // ProxyService interface service for proxy repository funcionalities
 type ProxyService interface {
 	SaveSecretKEY(string, string, string) error
-	GetKEY(string) (string, error)
+	GetKEY(string, string) (string, error)
 }
 
 // DefaultProxyService struct for management proxy repository
@@ -31,8 +31,8 @@ func (s DefaultProxyService) SaveSecretKEY(engine, key, apikey string) (string, 
 }
 
 // GetKEY get key
-func (s DefaultProxyService) GetKEY(key string) (string, error) {
-	result, err := s.repo.GetKEY(key)
+func (s DefaultProxyService) GetKEY(engine, key string) (string, error) {
+	result, err := s.repo.GetKEY(engine, key)
 	if err != nil {
 		return "failed", err
 	}

@@ -47,7 +47,7 @@ func StartProxy(
 
 	for _, endpoints := range config.ProxyGateway.EnpointsProxy {
 
-		h.ProxyGateway(endpoints, key, securityType)
+		h.ProxyGateway(endpoints, engine, key, securityType)
 	}
 
 	if config.ProxySSL.Enable {
