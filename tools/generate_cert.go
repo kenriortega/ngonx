@@ -4,6 +4,7 @@
 
 // license that can be found in the LICENSE file.
 
+//go:build ignore
 // +build ignore
 
 // Generate a self-signed X.509 certificate for a TLS server. Outputs to
@@ -240,7 +241,7 @@ func main() {
 
 	}
 
-	certOut, err := os.Create("./ssl/cert.pem")
+	certOut, err := os.Create("./scripts/cert.pem")
 
 	if err != nil {
 
@@ -262,7 +263,7 @@ func main() {
 
 	log.Print("wrote cert.pem\n")
 
-	keyOut, err := os.OpenFile("./ssl/key.pem", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	keyOut, err := os.OpenFile("./scripts/key.pem", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 
 	if err != nil {
 
