@@ -55,6 +55,7 @@ func StartProxy(
 		server := NewServerSSL(
 			config.ProxyGateway.Host,
 			portSSL,
+			nil,
 		)
 		server.StartSSL(
 			config.ProxySSL.CrtFile,
@@ -65,6 +66,7 @@ func StartProxy(
 		server := NewServer(
 			config.ProxyGateway.Host,
 			port,
+			nil,
 		)
 		server.Start()
 	}

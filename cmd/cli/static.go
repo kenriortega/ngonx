@@ -17,7 +17,7 @@ func StartStaticServer(
 
 		portSSL := config.ServerSSL.SSLPort
 
-		server := NewServerSSL(config.StaticServer.Host, portSSL)
+		server := NewServerSSL(config.StaticServer.Host, portSSL, nil)
 		server.StartSSL(
 			config.ServerSSL.CrtFile,
 			config.ServerSSL.KeyFile,
@@ -29,6 +29,7 @@ func StartStaticServer(
 		server := NewServer(
 			config.StaticServer.Host,
 			config.StaticServer.Port,
+			nil,
 		)
 		server.Start()
 	}

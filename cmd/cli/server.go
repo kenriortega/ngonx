@@ -16,10 +16,10 @@ type server struct {
 	*http.Server
 }
 
-func NewServer(host string, port int) *server {
+func NewServer(host string, port int, mux http.Handler) *server {
 
 	s := &http.Server{
-		Handler: nil,
+		Handler: mux,
 		Addr:    fmt.Sprintf("%s:%d", host, port),
 		// Good practice: enforce timeouts for servers you create!
 		WriteTimeout: 15 * time.Second,
@@ -29,7 +29,7 @@ func NewServer(host string, port int) *server {
 	return &server{s}
 }
 
-func NewServerSSL(host string, port int) *server {
+func NewServerSSL(host string, port int, mux http.Handler) *server {
 	cfg := &tls.Config{
 		MinVersion:               tls.VersionTLS12,
 		CurvePreferences:         []tls.CurveID{tls.CurveP521, tls.CurveP384, tls.CurveP256},
@@ -43,7 +43,7 @@ func NewServerSSL(host string, port int) *server {
 	}
 
 	s := &http.Server{
-		Handler: nil,
+		Handler: mux,
 		Addr:    fmt.Sprintf("%s:%d", host, port),
 		// Good practice: enforce timeouts for servers you create!
 		WriteTimeout: 15 * time.Second,
