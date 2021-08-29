@@ -33,5 +33,8 @@ func (ed *Endpoint) FromMapToJSON(data map[string]interface{}) {
 		logger.LogError(err.Error())
 	}
 
-	json.Unmarshal(b, &ed)
+	err = json.Unmarshal(b, &ed)
+	if err != nil {
+		logger.LogError(err.Error())
+	}
 }
