@@ -7,6 +7,7 @@ import (
 	"github.com/kenriortega/ngonx/pkg/badgerdb"
 	"github.com/kenriortega/ngonx/pkg/config"
 	"github.com/kenriortega/ngonx/pkg/genkey"
+	"github.com/kenriortega/ngonx/pkg/httpsrv"
 	"github.com/kenriortega/ngonx/pkg/logger"
 )
 
@@ -52,7 +53,7 @@ func StartProxy(
 
 	if config.ProxySSL.Enable {
 		portSSL := config.ProxyGateway.Port + config.ProxySSL.SSLPort
-		server := NewServerSSL(
+		server := httpsrv.NewServerSSL(
 			config.ProxyGateway.Host,
 			portSSL,
 			nil,
@@ -63,7 +64,7 @@ func StartProxy(
 		)
 	} else {
 		port = config.ProxyGateway.Port + port
-		server := NewServer(
+		server := httpsrv.NewServer(
 			config.ProxyGateway.Host,
 			port,
 			nil,

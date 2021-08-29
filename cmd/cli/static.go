@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/kenriortega/ngonx/pkg/httpsrv"
+
 	"github.com/kenriortega/ngonx/pkg/config"
 )
 
@@ -17,7 +19,7 @@ func StartStaticServer(
 
 		portSSL := config.ServerSSL.SSLPort
 
-		server := NewServerSSL(config.StaticServer.Host, portSSL, nil)
+		server := httpsrv.NewServerSSL(config.StaticServer.Host, portSSL, nil)
 		server.StartSSL(
 			config.ServerSSL.CrtFile,
 			config.ServerSSL.KeyFile,
@@ -26,7 +28,7 @@ func StartStaticServer(
 	} else {
 		http.Handle("/", http.FileServer(http.FS(frontEnd)))
 
-		server := NewServer(
+		server := httpsrv.NewServer(
 			config.StaticServer.Host,
 			config.StaticServer.Port,
 			nil,
