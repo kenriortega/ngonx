@@ -12,7 +12,7 @@ proxy:
   port_proxy: 30000
   port_exporter_proxy: 10000
   ssl_proxy:
-    enable: true
+    enable: false
     ssl_port: 443
     crt_file: ./ssl/cert.pem
     key_file: ./ssl/key.pem
