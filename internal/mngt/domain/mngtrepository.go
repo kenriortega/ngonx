@@ -1,9 +1,13 @@
 package mngt
 
 import (
+	"fmt"
+
 	"github.com/dgraph-io/badger/v3"
 	"github.com/go-redis/redis/v8"
 )
+
+var endpoints []Endpoint
 
 type MngtRepositoryStorage struct {
 	clientBadger *badger.DB
@@ -24,6 +28,13 @@ func NewMngtRepositoryStorage(clients ...interface{}) MngtRepositoryStorage {
 }
 
 func (r MngtRepositoryStorage) ListEnpoints() ([]Endpoint, error) {
-	var endpoints []Endpoint
+
 	return endpoints, nil
+}
+
+func (r MngtRepositoryStorage) RegisterEnpoint(endpoint Endpoint) error {
+
+	endpoints = append(endpoints, endpoint)
+	fmt.Println(endpoints)
+	return nil
 }
