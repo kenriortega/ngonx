@@ -72,6 +72,8 @@ func main() {
 	}
 	// Exporter Metrics
 	go metric.ExposeMetricServer(portExporterProxy)
+	// Admin pannel
+	go cli.StartMngt(configFromYaml)
 
 	switch service {
 	case "lb":
