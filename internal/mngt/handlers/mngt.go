@@ -22,17 +22,22 @@ func NewMngtHandler(service services.IMngtService) MngtHandler {
 func (mh MngtHandler) GetAllEndpoints(w http.ResponseWriter, r *http.Request) {
 
 	endpoints, err := mh.service.ListEnpoints()
+
 	if err != nil {
 		logger.LogError("handler: " + err.Error())
-		mh.writeResponse(w, http.StatusInternalServerError, err)
-		return
+		writeResponse(w, http.StatusInternalServerError, err)
+
 	}
-	mh.writeResponse(w, http.StatusOK, endpoints)
+	writeResponse(w, http.StatusOK, endpoints)
 
 }
 
 func (mh MngtHandler) RegisterEnpoint(data map[string]interface{}) {
-	var endpoint domain.Endpoint
+	endpoint := domain.NewEnpoint(
+		data["path_url"].(string),
+		data["status"].(string),
+	)
+
 	endpoint.FromMapToJSON(data)
 	err := mh.service.RegisterEnpoint(endpoint)
 	if err != nil {
@@ -40,7 +45,7 @@ func (mh MngtHandler) RegisterEnpoint(data map[string]interface{}) {
 	}
 }
 
-func (mh MngtHandler) writeResponse(w http.ResponseWriter, code int, data interface{}) {
+func writeResponse(w http.ResponseWriter, code int, data interface{}) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.WriteHeader(code)
 	w.Header().Add("Content-Type", "application/json")
@@ -48,4 +53,5 @@ func (mh MngtHandler) writeResponse(w http.ResponseWriter, code int, data interf
 	if err != nil {
 		logger.LogError(err.Error())
 	}
+
 }

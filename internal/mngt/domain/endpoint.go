@@ -7,25 +7,20 @@ import (
 )
 
 type Endpoint struct {
-	pathUrl string
-	status  string
+	PathUrl string `json:"path_url,omitempty"`
+	Status  string `json:"status,omitempty"`
 }
 type IEndpoint interface {
 	ListEnpoints() ([]Endpoint, error)
 	RegisterEnpoint(Endpoint) error
 }
 
-func NewEnpoint(pathUrl, status string) *Endpoint {
-	return &Endpoint{
-		pathUrl: pathUrl,
-		status:  status,
+func NewEnpoint(pathUrl, status string) Endpoint {
+	return Endpoint{
+		PathUrl: pathUrl,
+		Status:  status,
 	}
 }
-
-func (ed *Endpoint) PathUrl() string           { return ed.pathUrl }
-func (ed *Endpoint) SetPathUrl(pathUrl string) { ed.pathUrl = pathUrl }
-func (ed *Endpoint) Status() string            { return ed.status }
-func (ed *Endpoint) SetStatus(status string)   { ed.status = status }
 
 func (ed *Endpoint) FromMapToJSON(data map[string]interface{}) {
 	b, err := json.Marshal(data)

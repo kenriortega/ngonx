@@ -20,6 +20,7 @@ func NewMngtService(repository domain.IEndpoint) MngtService {
 
 func (s MngtService) ListEnpoints() ([]domain.Endpoint, error) {
 	endpoints, err := s.repo.ListEnpoints()
+
 	if err != nil {
 		return nil, err
 	}

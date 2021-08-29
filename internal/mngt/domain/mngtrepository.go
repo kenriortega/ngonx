@@ -1,8 +1,6 @@
 package mngt
 
 import (
-	"fmt"
-
 	"github.com/dgraph-io/badger/v3"
 	"github.com/go-redis/redis/v8"
 )
@@ -35,6 +33,6 @@ func (r MngtRepositoryStorage) ListEnpoints() ([]Endpoint, error) {
 func (r MngtRepositoryStorage) RegisterEnpoint(endpoint Endpoint) error {
 
 	endpoints = append(endpoints, endpoint)
-	fmt.Println(endpoints)
+
 	return nil
 }
