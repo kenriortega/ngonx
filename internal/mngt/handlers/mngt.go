@@ -44,5 +44,8 @@ func (mh MngtHandler) writeResponse(w http.ResponseWriter, code int, data interf
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.WriteHeader(code)
 	w.Header().Add("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(data)
+	err := json.NewEncoder(w).Encode(data)
+	if err != nil {
+		logger.LogError(err.Error())
+	}
 }
