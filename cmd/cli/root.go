@@ -2,6 +2,7 @@ package cli
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
 	domain "github.com/kenriortega/ngonx/internal/mngt/domain"
@@ -9,7 +10,40 @@ import (
 	services "github.com/kenriortega/ngonx/internal/mngt/services"
 	"github.com/kenriortega/ngonx/pkg/config"
 	"github.com/kenriortega/ngonx/pkg/httpsrv"
+	"github.com/kenriortega/ngonx/pkg/logger"
+	"github.com/spf13/cobra"
 )
+
+// rootCmd represents the base command when called without any subcommands
+var rootCmd = &cobra.Command{
+	Use:   "ngonxctl",
+	Short: "A proxy reverse inspired on nginx & traefik",
+	Long:  `This is Ngonx ctl a proxy reverse inspired on nginx & traefik`,
+}
+
+func Execute() {
+	if err := rootCmd.Execute(); err != nil {
+
+		logger.LogError(err.Error())
+		os.Exit(1)
+	}
+	go StartMngt(configFromYaml)
+
+}
+func init() {
+	cobra.OnInitialize(initConfig)
+	rootCmd.PersistentFlags().StringVarP(&cfgFile, flagCfgFile, "f", cfgFile, "File setting.yml")
+	rootCmd.PersistentFlags().StringVarP(&cfgPath, flagCfgPath, "p", cfgPath, "Config path only ")
+}
+
+// initConfig reads in config file and ENV variables if set.
+func initConfig() {
+	configFromYaml, errConfig = config.LoadConfig(cfgPath, cfgFile)
+
+	if errConfig != nil {
+		logger.LogError("Yaml file not found please run command setup " + errConfig.Error())
+	}
+}
 
 func StartMngt(config config.Config) {
 	r := mux.NewRouter()
