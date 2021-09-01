@@ -107,7 +107,6 @@ func (ph *ProxyHandler) ProxyGateway(endpoints domain.ProxyEndpoint, engine, key
 }
 
 func metricRegister(req *http.Request, target *url.URL) {
-	timer := prometheus.NewTimer(metric.DurationHttpRequest.WithLabelValues(target.String()))
 	metric.CountersByEndpoint.With(
 		prometheus.Labels{
 			"proxyPath":    req.RequestURI,
@@ -123,7 +122,6 @@ func metricRegister(req *http.Request, target *url.URL) {
 		},
 	).Inc()
 
-	timer.ObserveDuration()
 }
 
 // checkJWTSecretKeyFromRequest check jwt for request
