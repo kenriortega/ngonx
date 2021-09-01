@@ -15,26 +15,31 @@ make compile
 > List of command available
 
 ```bash
-  -backends string
-        Load balanced backends, use commas to separate
-  -configFile string
-        Only config filename.yaml default ngonx.yaml (default "ngonx.yaml")
-  -configPath string
-        Config path only not filename.yaml (default "pwd")
-  -genkey
-        Action for generate hash for protected routes
-  -lbPort int
-        Port to serve to run load balancing (default 3030)
-  -prevkey string
-        Action for save a previous hash for protected routes to validate JWT
-  -proxyPort int
-        Port to serve to run proxy
-  -setup
-        Create yaml file configuration
-  -type string
-        Main Service default is proxy (default "proxy")
-  -version
-        Display version and exit
+ngonxctl -h
+```
+
+```bash
+This is Ngonx ctl a proxy reverse inspired on nginx & traefik
+
+Usage:
+  ngonxctl [command]
+
+Available Commands:
+  completion  generate the autocompletion script for the specified shell
+  help        Help about any command
+  lb          Run ngonx as a load balancer (round robin)
+  proxy       Run ngonx as a reverse proxy
+  setup       Create configuration file it`s doesn`t exist
+  static      Run ngonx as a static web server
+  version     Print the version number of ngonxctl
+
+Flags:
+  -f, --cfgfile string   File setting.yml (default "ngonx.yaml")
+  -p, --cfgpath string   Config path only  (default "path/binary")
+  -h, --help             help for ngonxctl
+
+Use "ngonxctl [command] --help" for more information about a command.
+
 ```
 
 > Start Proxy server first time 
@@ -42,37 +47,57 @@ make compile
 `genkey` command in true generate random secretkey and save on badgerdb on `badger.data`
 
 ```bash
-./ngxctl -proxyPort 5000 -genkey true
+./ngonxctl proxy -port 5000 -genkey true
 ```
 
 `prevkey` command receive a custom secretkey and save this on badgerdb on `badger.data`
 
 ```bash
-./ngxctl -proxyPort 5000 -prevkey <secretKey>
+./ngonxctl proxy -port 5000 -prevkey <secretKey>
 ```
 
 > Start Proxy server
 
 ```bash
-./ngxctl -proxyPort 5001
+./ngonxctl proxy -port 5000
 ```
 
 > Start load balancer
 
 ```bash
-./ngxctl -type lb --backends "http://localhost:5000,http://localhost:5001,http://localhost:5002"
+./ngonxctl lb --backends "http://localhost:5000,http://localhost:5001,http://localhost:5002"
 ```
+> Start static files server
+
+```bash
+./ngonxctl static
+```
+
+Metrics
+-----------
+
+Currently ngonx use prometheus as a metric collector. The main service `proxy` expose for port 10000 on route `/metrics`
+
+```bash
+curl http://localhost:10000/metrics
+```
+
+
+Management API & Web(coming...)
+-----------
+
+Currently ngonx use port 10001 for export a simple api to check all services 
+
+```bash
+curl http://localhost:10001/api/v1/mngt/
+```
+
+
 
 > Start API PoC service
 
 ```bash
 go run  services/micro-a/api.go --port <port>
-```
-
-> Start static files server
-
-```bash
-go run cmd/main.go -type static
 ```
 
 Install badger db on window if you don`t use CGO
@@ -84,7 +109,7 @@ CGO_ENABLED=0 go get github.com/dgraph-io/badger/v3
 
 ```bash
 
-cd ssl
+cd scripts
 
 chmod +x ./generate.sh
 
@@ -133,10 +158,6 @@ certbot renew
 
 ---
 
-Metrics
------------
-
-Currently ngonx used prometheus for metric collector. The main service `proxy` expose for port 10000 on route `/metrics`
 
 BenchMarking
 ------------

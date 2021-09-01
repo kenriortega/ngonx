@@ -4,32 +4,42 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/kenriortega/ngonx/pkg/config"
+	"github.com/kenriortega/ngonx/pkg/httpsrv"
+	"github.com/spf13/cobra"
 )
 
-func StartStaticServer(
-	config config.Config,
-) {
-	frontEnd := os.DirFS(config.StaticServer.StaticFile)
-	if config.ServerSSL.Enable {
+var staticCmd = &cobra.Command{
+	Use:   "static",
+	Short: "Run ngonx as a static web server",
+	Run: func(cmd *cobra.Command, args []string) {
+		frontEnd := os.DirFS(configFromYaml.StaticServer.StaticFile)
+		if configFromYaml.ServerSSL.Enable {
 
-		http.Handle("/", http.FileServer(http.FS(frontEnd)))
+			http.Handle("/", http.FileServer(http.FS(frontEnd)))
 
-		portSSL := config.ServerSSL.SSLPort
+			portSSL := configFromYaml.ServerSSL.SSLPort
 
-		server := NewServerSSL(config.StaticServer.Host, portSSL)
-		server.StartSSL(
-			config.ServerSSL.CrtFile,
-			config.ServerSSL.KeyFile,
-		)
+			server := httpsrv.NewServerSSL(configFromYaml.StaticServer.Host, portSSL, nil)
+			server.StartSSL(
+				configFromYaml.ServerSSL.CrtFile,
+				configFromYaml.ServerSSL.KeyFile,
+			)
 
-	} else {
-		http.Handle("/", http.FileServer(http.FS(frontEnd)))
+		} else {
+			http.Handle("/", http.FileServer(http.FS(frontEnd)))
 
-		server := NewServer(
-			config.StaticServer.Host,
-			config.StaticServer.Port,
-		)
-		server.Start()
-	}
+			server := httpsrv.NewServer(
+				configFromYaml.StaticServer.Host,
+				configFromYaml.StaticServer.Port,
+				nil,
+			)
+			server.Start()
+		}
+
+	},
+}
+
+func init() {
+
+	rootCmd.AddCommand(staticCmd)
 }
