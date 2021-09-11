@@ -25,14 +25,25 @@ func NewMngtRepositoryStorage(clients ...interface{}) MngtRepositoryStorage {
 	return mngtRepository
 }
 
-func (r MngtRepositoryStorage) ListEnpoints() ([]Endpoint, error) {
+func (r MngtRepositoryStorage) ListEndpoints() ([]Endpoint, error) {
 
 	return endpoints, nil
 }
 
-func (r MngtRepositoryStorage) RegisterEnpoint(endpoint Endpoint) error {
+func (r MngtRepositoryStorage) RegisterEndpoint(endpoint Endpoint) error {
 
 	endpoints = append(endpoints, endpoint)
+
+	return nil
+}
+
+func (r MngtRepositoryStorage) UpdateEndpoint(endpoint Endpoint) error {
+
+	for idx, it := range endpoints {
+		if it.ID == endpoint.ID {
+			endpoints[idx].Status = endpoint.Status
+		}
+	}
 
 	return nil
 }

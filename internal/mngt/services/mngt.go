@@ -5,8 +5,9 @@ import (
 )
 
 type IMngtService interface {
-	ListEnpoints() ([]domain.Endpoint, error)
-	RegisterEnpoint(domain.Endpoint) error
+	ListEndpoints() ([]domain.Endpoint, error)
+	RegisterEndpoint(domain.Endpoint) error
+	UpdateEndpoint(domain.Endpoint) error
 }
 
 type MngtService struct {
@@ -18,8 +19,8 @@ func NewMngtService(repository domain.IEndpoint) MngtService {
 	return MngtService{repo: repository}
 }
 
-func (s MngtService) ListEnpoints() ([]domain.Endpoint, error) {
-	endpoints, err := s.repo.ListEnpoints()
+func (s MngtService) ListEndpoints() ([]domain.Endpoint, error) {
+	endpoints, err := s.repo.ListEndpoints()
 
 	if err != nil {
 		return nil, err
@@ -27,9 +28,19 @@ func (s MngtService) ListEnpoints() ([]domain.Endpoint, error) {
 	return endpoints, nil
 }
 
-func (s MngtService) RegisterEnpoint(endpoint domain.Endpoint) error {
+func (s MngtService) RegisterEndpoint(endpoint domain.Endpoint) error {
 
-	err := s.repo.RegisterEnpoint(endpoint)
+	err := s.repo.RegisterEndpoint(endpoint)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s MngtService) UpdateEndpoint(endpoint domain.Endpoint) error {
+
+	err := s.repo.UpdateEndpoint(endpoint)
 	if err != nil {
 		return err
 	}
