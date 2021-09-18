@@ -12,5 +12,7 @@ require (
 	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/spf13/cobra v1.2.1 // indirect
 	github.com/spf13/viper v1.8.1
+	github.com/talos-systems/grpc-proxy v0.2.0
 	go.uber.org/zap v1.19.0
+	google.golang.org/grpc v1.40.0
 )
