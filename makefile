@@ -29,3 +29,8 @@ gossl:
 #Only use if you have installed UPX compress
 compress:
 	./upx -9 -q ./build/${name}-${version}-linux-amd64
+
+grpcsvr:
+	go run examples/calculator/calc_server/server.go
+grpccli:
+	go run examples/calculator/calc_client/client.go
