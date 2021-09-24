@@ -1,3 +1,4 @@
+# Static web server like nginx
 static_server:
   host_server: 0.0.0.0
   port_server: 8080
@@ -7,6 +8,7 @@ static_server:
     ssl_port: 8443
     crt_file: ./ssl/cert.pem
     key_file: ./ssl/key.pem
+# Grpc reverse proxy transparent
 grpc:
   listener_grpc: "0.0.0.0:50000"
   client_crt: ./scripts/ca.crt
@@ -18,6 +20,7 @@ grpc:
   endpoints_grpc:
     - name: /calculator.CalculatorService
       host_uri: 0.0.0.0:50050
+# Reverse Proxy
 proxy:
   host_proxy: 0.0.0.0
   port_proxy: 30000
