@@ -14,7 +14,21 @@ import (
 // inside `goproxy.yaml`
 type Config struct {
 	ProxyGateway `mapstructure:"proxy"`
+	GrpcProxy    `mapstructure:"grpc"`
 	StaticServer `mapstructure:"static_server"`
+}
+
+// GrpcProxy ...
+type GrpcProxy struct {
+	Listener       string         `mapstructure:"listener_grpc"`
+	GrpcEndpoints  []GrpcEndpoint `mapstructure:"endpoints_grpc"`
+	GrpcSSL        OptionSSL      `mapstructure:"ssl_grpc"`
+	GrpcClientCert string         `mapstructure:"client_crt"`
+}
+
+type GrpcEndpoint struct {
+	Name    string `mapstructure:"name"`
+	HostURI string `mapstructure:"host_uri"`
 }
 
 // StaticServer struct for the static server obeject
@@ -88,6 +102,16 @@ static_server:
     ssl_port: 8443
     crt_file: ./key/cert.pem
     key_file: ./key/key.pem
+grpc:
+  listener_grpc: "0.0.0.0:50000"
+  ssl_grpc:
+  	enable: false
+  	ssl_port: 50443
+  	crt_file: ./ssl/cert.pem
+  	key_file: ./ssl/key.pem
+  endpoints_grpc:
+  	- name: backend-1
+  	- host_uri: 0.0.0.0:50050
 proxy:
   host_proxy: 0.0.0.0
   port_proxy: 30000

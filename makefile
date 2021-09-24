@@ -20,12 +20,19 @@ compile:
 	GOOS=linux GOARCH=amd64 go build -ldflags=${linker_flags} -o ./build/${name}-${version}-linux-amd64 cmd/main.go
 	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags=${linker_flags} -o ./build/${name}-${version}-windows-amd64.exe cmd/main.go
 
+# Only for proxy and http server
 gocert:
 	go run ./tools/generate_cert.go
 
+# for grpc server
 gossl:
-	./scripts/generate.sh
+	cd scripts && ./generate.sh
 
 #Only use if you have installed UPX compress
 compress:
 	./upx -9 -q ./build/${name}-${version}-linux-amd64
+
+grpcsvr:
+	go run examples/calculator/calc_server/server.go
+grpccli:
+	go run examples/calculator/calc_client/client.go

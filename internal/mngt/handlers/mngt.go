@@ -21,7 +21,7 @@ func NewMngtHandler(service services.IMngtService) MngtHandler {
 
 func (mh MngtHandler) GetAllEndpoints(w http.ResponseWriter, r *http.Request) {
 
-	endpoints, err := mh.service.ListEnpoints()
+	endpoints, err := mh.service.ListEndpoints()
 
 	if err != nil {
 		logger.LogError("handler: " + err.Error())
@@ -32,14 +32,22 @@ func (mh MngtHandler) GetAllEndpoints(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (mh MngtHandler) RegisterEnpoint(data map[string]interface{}) {
+func (mh MngtHandler) RegisterEndpoint(data map[string]interface{}) {
 	endpoint := domain.NewEnpoint(
 		data["path_url"].(string),
 		data["status"].(string),
 	)
 
 	endpoint.FromMapToJSON(data)
-	err := mh.service.RegisterEnpoint(endpoint)
+	err := mh.service.RegisterEndpoint(endpoint)
+	if err != nil {
+		logger.LogError(err.Error())
+	}
+}
+
+func (mh MngtHandler) UpdateEndpoint(endpoint domain.Endpoint) {
+
+	err := mh.service.UpdateEndpoint(endpoint)
 	if err != nil {
 		logger.LogError(err.Error())
 	}
