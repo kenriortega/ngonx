@@ -20,5 +20,4 @@ var (
 	flagPrevKey    = "prevkey"
 	flagCfgFile    = "cfgfile"
 	flagCfgPath    = "cfgpath"
-	flagModeGRPC   = "mode"
 )

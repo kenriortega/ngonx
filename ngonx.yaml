@@ -8,16 +8,16 @@ static_server:
     crt_file: ./ssl/cert.pem
     key_file: ./ssl/key.pem
 grpc:
-  host_grpc: 0.0.0.0
-  port_grpc: 8080
+  listener_grpc: "0.0.0.0:50000"
+  client_crt: ./scripts/ca.crt
   ssl_grpc:
     enable: false
-    ssl_port: 8443
-    crt_file: ./ssl/cert.pem
-    key_file: ./ssl/key.pem
-  grpc_endpoints:
-    - name: microgrpc
-    - host_uri: localhost:50001
+    ssl_port: 50443
+    crt_file: ./scripts/server.crt
+    key_file: ./scripts/server.pem
+  endpoints_grpc:
+    - name: /calculator.CalculatorService
+      host_uri: 0.0.0.0:50050
 proxy:
   host_proxy: 0.0.0.0
   port_proxy: 30000

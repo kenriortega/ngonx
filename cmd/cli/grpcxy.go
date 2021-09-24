@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"strings"
 
 	"github.com/kenriortega/ngonx/pkg/logger"
 	"github.com/spf13/cobra"
@@ -21,80 +22,90 @@ var grpcCmd = &cobra.Command{
 	Use:   "grpc",
 	Short: "Run ngonx as a grpc proxy",
 	Run: func(cmd *cobra.Command, args []string) {
-		var s *grpc.Server
-		port, err := cmd.Flags().GetInt(flagPort)
+		var opts []grpc.ServerOption
+
+		lis, err := net.Listen("tcp", configFromYaml.GrpcProxy.Listener)
 		if err != nil {
-			logger.LogError(err.Error())
-		}
-		mode, err := cmd.Flags().GetString(flagModeGRPC)
-		if err != nil {
-			logger.LogError(err.Error())
-		}
-		lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", port))
-		if err != nil {
-			log.Fatalf("Failed to listen: %v", err)
+			log.Fatalf("failed to listen: %v", err)
 		}
 
-		switch mode {
-		case "transparent":
+		logger.LogInfo(fmt.Sprintf("Proxy running at %q\n", configFromYaml.GrpcProxy.Listener))
+		simpleBackendGen := func(hostname string) proxy.Backend {
+			return &proxy.SingleBackend{
+				GetConn: func(ctx context.Context) (context.Context, *grpc.ClientConn, error) {
+					md, _ := metadata.FromIncomingContext(ctx)
 
-			if configFromYaml.GrpcProxy.GrpcSSL.Enable {
-				creds, sslErr := credentials.NewServerTLSFromFile(
-					configFromYaml.GrpcProxy.GrpcSSL.CrtFile,
-					configFromYaml.GrpcProxy.GrpcSSL.KeyFile,
-				)
-				if sslErr != nil {
-					log.Fatalf("Failed to parse credentials: %v", sslErr)
-					return
-				}
-				simpleBackendGen := func(hostname string) proxy.Backend {
-					return &proxy.SingleBackend{
-						GetConn: func(ctx context.Context) (context.Context, *grpc.ClientConn, error) {
-							md, _ := metadata.FromIncomingContext(ctx)
-
-							// Copy the inbound metadata explicitly.
-							outCtx := metadata.NewOutgoingContext(ctx, md.Copy())
-							// Make sure we use DialContext so the dialing can be canceled/time out together with the context.
-							conn, err := grpc.DialContext(ctx, hostname, grpc.WithCodec(proxy.Codec())) //nolint: staticcheck
-
-							return outCtx, conn, err
-						},
+					outCtx := metadata.NewOutgoingContext(ctx, md.Copy())
+					if configFromYaml.GrpcSSL.Enable {
+						creds, sslErr := credentials.NewClientTLSFromFile(
+							configFromYaml.GrpcClientCert, "")
+						if sslErr != nil {
+							log.Fatalf("Failed to parse credentials: %v", sslErr)
+						}
+						conn, err := grpc.DialContext(
+							ctx,
+							hostname,
+							grpc.WithTransportCredentials(creds),
+							grpc.WithCodec(proxy.Codec()),
+						) //nolint: staticcheck
+						return outCtx, conn, err
 					}
-				}
+					conn, err := grpc.DialContext(
+						ctx,
+						hostname,
+						grpc.WithInsecure(),
+						grpc.WithCodec(proxy.Codec()),
+					) //nolint: staticcheck
 
-				director = func(ctx context.Context, fullMethodName string) (proxy.Mode, []proxy.Backend, error) {
+					return outCtx, conn, err
+				},
+			}
+		}
 
-					_, ok := metadata.FromIncomingContext(ctx)
-
-					if ok {
-						// Decide on which backend to dial
-						hostUri := configFromYaml.GrpcProxy.GrpcEndpoints[0].HostURI
-						return proxy.One2One, []proxy.Backend{
-							simpleBackendGen(hostUri),
-						}, nil
-					}
-
+		director = func(ctx context.Context, fullMethodName string) (proxy.Mode, []proxy.Backend, error) {
+			for _, bkd := range configFromYaml.GrpcEndpoints {
+				// Make sure we never forward internal services.
+				if !strings.HasPrefix(fullMethodName, bkd.Name) {
 					return proxy.One2One, nil, status.Errorf(codes.Unimplemented, "Unknown method")
 				}
-				opts := grpc.Creds(creds)
-				s = grpc.NewServer(
-					opts,
-					grpc.CustomCodec(proxy.Codec()),
-					grpc.UnknownServiceHandler(
-						proxy.TransparentHandler(director),
-					),
-				)
-				if err := s.Serve(lis); err != nil {
-					logger.LogError(err.Error())
+				md, ok := metadata.FromIncomingContext(ctx)
+				if ok {
+					if _, exists := md[":authority"]; exists {
+						return proxy.One2One, []proxy.Backend{
+							simpleBackendGen(bkd.HostURI),
+						}, nil
+					}
 				}
 			}
+			return proxy.One2One, nil, status.Errorf(codes.Unimplemented, "Unknown method")
+		}
+		opts = append(opts,
+			grpc.CustomCodec(proxy.Codec()),
+			grpc.UnknownServiceHandler(proxy.TransparentHandler(director)),
+		)
+		// SSL
+		if configFromYaml.GrpcSSL.Enable {
+
+			creds, sslErr := credentials.NewServerTLSFromFile(
+				configFromYaml.GrpcSSL.CrtFile,
+				configFromYaml.GrpcSSL.KeyFile,
+			)
+			if sslErr != nil {
+				log.Fatalf("Failed to parse credentials: %v", sslErr)
+				return
+			}
+			opts = append(opts, grpc.Creds(creds))
+		}
+
+		server := grpc.NewServer(opts...)
+
+		if err := server.Serve(lis); err != nil {
+			log.Fatalf("failed to serve: %v", err)
 		}
 	},
 }
 
 func init() {
-	proxyCmd.Flags().Int(flagPort, 50_000, "Port to run grpc proxy")
-	proxyCmd.Flags().String(flagModeGRPC, "transparent", "Action for generate hash for protected routes")
 
 	rootCmd.AddCommand(grpcCmd)
 }

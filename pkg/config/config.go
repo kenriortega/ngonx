@@ -20,10 +20,10 @@ type Config struct {
 
 // GrpcProxy ...
 type GrpcProxy struct {
-	Host          string         `mapstructure:"host_grpc"`
-	Port          int            `mapstructure:"port_grpc"`
-	GrpcEndpoints []GrpcEndpoint `mapstructure:"grpc_endpoints"`
-	GrpcSSL       OptionSSL      `mapstructure:"ssl_grpc"`
+	Listener       string         `mapstructure:"listener_grpc"`
+	GrpcEndpoints  []GrpcEndpoint `mapstructure:"endpoints_grpc"`
+	GrpcSSL        OptionSSL      `mapstructure:"ssl_grpc"`
+	GrpcClientCert string         `mapstructure:"client_crt"`
 }
 
 type GrpcEndpoint struct {
@@ -103,16 +103,15 @@ static_server:
     crt_file: ./key/cert.pem
     key_file: ./key/key.pem
 grpc:
-  host_grpc: 0.0.0.0
-  port_grpc: 8080
+  listener_grpc: "0.0.0.0:50000"
   ssl_grpc:
-	enable: false
-	ssl_port: 8443
-	crt_file: ./ssl/cert.pem
-	key_file: ./ssl/key.pem
-  grpc_endpoints:
-    - name: microgrpc
-    - host_uri: localhost:50001
+  	enable: false
+  	ssl_port: 50443
+  	crt_file: ./ssl/cert.pem
+  	key_file: ./ssl/key.pem
+  endpoints_grpc:
+  	- name: backend-1
+  	- host_uri: 0.0.0.0:50050
 proxy:
   host_proxy: 0.0.0.0
   port_proxy: 30000
