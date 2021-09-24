@@ -5,7 +5,10 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"os"
+	"os/signal"
 	"strings"
+	"time"
 
 	"github.com/kenriortega/ngonx/pkg/logger"
 	"github.com/spf13/cobra"
@@ -99,6 +102,7 @@ var grpcCmd = &cobra.Command{
 
 		server := grpc.NewServer(opts...)
 
+		go gracefulShutdown(server)
 		if err := server.Serve(lis); err != nil {
 			log.Fatalf("failed to serve: %v", err)
 		}
@@ -108,4 +112,18 @@ var grpcCmd = &cobra.Command{
 func init() {
 
 	rootCmd.AddCommand(grpcCmd)
+}
+
+func gracefulShutdown(server *grpc.Server) {
+	quit := make(chan os.Signal, 1)
+
+	signal.Notify(quit, os.Interrupt)
+	sig := <-quit
+	logger.LogInfo(fmt.Sprintf("server is shutting down %s", sig.String()))
+
+	_, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	server.GracefulStop()
+	logger.LogInfo("server stopped")
 }
