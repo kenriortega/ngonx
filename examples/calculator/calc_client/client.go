@@ -13,6 +13,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+// #nosec
 func main() {
 	fmt.Println("Client calculator")
 
@@ -31,6 +32,8 @@ func main() {
 	doBiDiStreaming(c)
 	doSqrt(c)
 }
+
+// #nosec
 func doSqrt(c calculatorpb.CalculatorServiceClient) {
 
 	num := -12
@@ -53,6 +56,7 @@ func doSqrt(c calculatorpb.CalculatorServiceClient) {
 	fmt.Println(res.GetNumberRoot())
 }
 
+// #nosec
 func doUnary(c calculatorpb.CalculatorServiceClient) {
 	req := &calculatorpb.SumRequest{
 		FirstNumber:  5,
@@ -65,6 +69,7 @@ func doUnary(c calculatorpb.CalculatorServiceClient) {
 	log.Println("response: ", res)
 }
 
+// #nosec
 func doStreaming(c calculatorpb.CalculatorServiceClient) {
 	req := &calculatorpb.PrimeNumberDecompositionRequest{
 		Number: 12,
@@ -87,6 +92,8 @@ func doStreaming(c calculatorpb.CalculatorServiceClient) {
 		log.Printf("Recv msg %v\n", res.GetPrimerFactor())
 	}
 }
+
+// #nosec
 func doClientStreaming(c calculatorpb.CalculatorServiceClient) {
 	stream, err := c.ComputeAverage(context.Background())
 	if err != nil {
@@ -108,6 +115,7 @@ func doClientStreaming(c calculatorpb.CalculatorServiceClient) {
 	fmt.Println("Result ", res.GetAverage())
 }
 
+// #nosec
 func doBiDiStreaming(c calculatorpb.CalculatorServiceClient) {
 
 	stream, err := c.FindMaximun(context.Background())

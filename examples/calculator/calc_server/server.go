@@ -17,6 +17,7 @@ import (
 
 type server struct{}
 
+// #nosec
 func (*server) Sum(ctx context.Context, req *calculatorpb.SumRequest) (*calculatorpb.SumResponse, error) {
 	firstNumber := req.GetFirstNumber()
 	secondNumber := req.GetSecondNumber()
@@ -28,6 +29,7 @@ func (*server) Sum(ctx context.Context, req *calculatorpb.SumRequest) (*calculat
 	return res, nil
 }
 
+// #nosec
 func (*server) PrimeNumberDecomposition(
 	req *calculatorpb.PrimeNumberDecompositionRequest,
 	stream calculatorpb.CalculatorService_PrimeNumberDecompositionServer,
@@ -49,6 +51,7 @@ func (*server) PrimeNumberDecomposition(
 	return nil
 }
 
+// #nosec
 func (*server) ComputeAverage(stream calculatorpb.CalculatorService_ComputeAverageServer) error {
 	sum := int32(0)
 	count := 0
@@ -70,6 +73,7 @@ func (*server) ComputeAverage(stream calculatorpb.CalculatorService_ComputeAvera
 	}
 }
 
+// #nosec
 func (*server) FindMaximun(stream calculatorpb.CalculatorService_FindMaximunServer) error {
 	maximun := int32(0)
 	for {
@@ -95,6 +99,7 @@ func (*server) FindMaximun(stream calculatorpb.CalculatorService_FindMaximunServ
 	}
 }
 
+// #nosec
 func (*server) SquareRoot(ctx context.Context, req *calculatorpb.SquareRootRequest) (*calculatorpb.SquareRootResponse, error) {
 	number := req.GetNumber()
 
@@ -109,6 +114,8 @@ func (*server) SquareRoot(ctx context.Context, req *calculatorpb.SquareRootReque
 		NumberRoot: math.Sqrt(float64(number)),
 	}, nil
 }
+
+// #nosec
 func main() {
 	fmt.Println("Calculator Server 0.0.0.0:50050")
 
