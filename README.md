@@ -1,10 +1,17 @@
-# Ngonx
+# nGOnx
 
-It`s a simple proxy server written with go.
+It`s a simple proxy server written with [go](https://github.com/golang/go).
 The core services are based on [nginx](https://github.com/nginx) server, and [traefik](https://github.com/traefik/traefik)
 
+## Features
 
-## ngonx commands
+* Run ngonx as a reverse proxy
+* Run ngonx as a grpc proxy
+* Run ngonx as a load balancer (round robin)
+* Run ngonx as a static web server
+* Project collaborative and open source
+
+## **nGOnx** commands
 
 > Build
 
@@ -26,6 +33,7 @@ Usage:
 
 Available Commands:
   completion  generate the autocompletion script for the specified shell
+  grpc        Run ngonx as a grpc proxy
   help        Help about any command
   lb          Run ngonx as a load balancer (round robin)
   proxy       Run ngonx as a reverse proxy
@@ -42,7 +50,61 @@ Use "ngonxctl [command] --help" for more information about a command.
 
 ```
 
-> Start Proxy server first time 
+> Yaml file fields
+
+```yaml
+# Static web server like nginx
+static_server:
+  host_server: 0.0.0.0
+  port_server: 8080
+  static_files: ./examples/dist
+  ssl_server:
+    enable: true
+    ssl_port: 8443
+    crt_file: ./ssl/cert.pem
+    key_file: ./ssl/key.pem
+# Grpc reverse proxy transparent
+grpc:
+  listener_grpc: "0.0.0.0:50000"
+  client_crt: ./scripts/ca.crt
+  ssl_grpc:
+    enable: false
+    ssl_port: 50443
+    crt_file: ./scripts/server.crt
+    key_file: ./scripts/server.pem
+  endpoints_grpc:
+    - name: /calculator.CalculatorService
+      host_uri: 0.0.0.0:50050
+# Reverse Proxy
+proxy:
+  host_proxy: 0.0.0.0
+  port_proxy: 30000
+  port_exporter_proxy: 10000
+  ssl_proxy:
+    enable: false
+    ssl_port: 443
+    crt_file: ./ssl/cert.pem
+    key_file: ./ssl/key.pem
+  cache_proxy:
+    engine: badger # badgerDB|redis
+    key: secretKey
+  security:
+    type: apikey # apikey|jwt|none
+  # maps of microservices with routes
+  services_proxy:
+      - name: microA
+        host_uri: http://localhost:3000
+        endpoints:
+          - path_endpoints: /api/v1/health/
+            path_proxy: /health/
+            path_protected: false
+
+          - path_endpoints: /api/v1/version/
+            path_proxy: /version/
+            path_protected: true
+```
+
+> Start Proxy server first time
 
 `genkey` command in true generate random secretkey and save on badgerdb on `badger.data`
 
@@ -73,6 +135,12 @@ Use "ngonxctl [command] --help" for more information about a command.
 ./ngonxctl static
 ```
 
+> Start grpc proxy server
+
+```bash
+./ngonxctl grpc
+```
+
 Metrics
 -----------
 
@@ -98,6 +166,16 @@ curl http://localhost:10001/api/v1/mngt/
 
 ```bash
 go run  services/micro-a/api.go --port <port>
+```
+
+> Start Gprc services from example folder
+
+Excute from  makefile the following cmds
+
+```bash
+make grpcsvr # for start server
+
+make make grpccli #for start client
 ```
 
 Install badger db on window if you don`t use CGO
