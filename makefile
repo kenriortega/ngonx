@@ -36,3 +36,5 @@ grpcsvr:
 	go run examples/calculator/calc_server/server.go
 grpccli:
 	go run examples/calculator/calc_client/client.go
+releaser:
+	goreleaser release --snapshot --rm-dist
