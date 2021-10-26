@@ -36,3 +36,4 @@ build
 *.key
 *.pem
 *.csr
+dist
