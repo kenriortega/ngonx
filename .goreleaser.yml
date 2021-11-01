@@ -31,7 +31,7 @@ builds:
     # Custom ldflags templates.
     # Default is `-s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}} -X main.builtBy=goreleaser`.
     ldflags:
-      - -s -w -X cli.version={{.Version}} -X cli.versionHash={{.Commit}} -X cli.buildTime={{.Date}}
+      - -s -w -X github.com/kenriortega/ngonx/cmd/cli.version={{.Version}} -X github.com/kenriortega/ngonx/cmd/cli.versionHash={{.Commit}} -X github.com/kenriortega/ngonx/cmd/cli.buildTime={{.Date}}
 
 
     env:

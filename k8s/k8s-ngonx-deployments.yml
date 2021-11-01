@@ -1,0 +1,49 @@
+---
+apiVersion: apps/v1
+kind: Deployment                 # Type of Kubernetes resource
+metadata:
+  name: ngonx-proxy           # Name of the Kubernetes resource
+spec:
+  replicas: 3                    # Number of pods to run at any given time
+  selector:
+    matchLabels:
+      app: ngonx-proxy        # This deployment applies to any Pods matching the specified label
+  template:                      # This deployment will create a set of pods using the configurations in this template
+    metadata:
+      labels:                    # The labels that will be applied to all of the pods in this deployment
+        app: ngonx-proxy
+    spec:                        # Spec for the container which will run in the Pod
+      containers:
+      - name: ngonx-proxy
+        image: kenriortega/ngonx-proxy:0.1.0
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 8080  # Should match the port number that the Go application listens on
+        livenessProbe:           # To check the health of the Pod
+          httpGet:
+            path: /health
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 15
+          timeoutSeconds: 5
+        readinessProbe:          # To check if the Pod is ready or not
+          httpGet:
+            path: /readiness
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 5
+          timeoutSeconds: 1
+---
+apiVersion: v1
+kind: Service                    # Type of kubernetes resource
+metadata:
+  name: ngonx-proxy-service   # Name of the resource
+spec:
+  type: NodePort                 # If you're deploying on cloud, you can use `type: LoadBalancer`. It will automatically provision a load balancer with the cloud provider that will route traffic to your application.
+  ports:                         # Take incoming HTTP requests on port 9090 and forward them to the targetPort of 8080
+  - name: http
+    port: 9090
+    targetPort: 8080
+  selector:
+    app: ngonx-proxy          # Map any pod with name ngonx-proxy to this service
