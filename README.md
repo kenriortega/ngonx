@@ -160,6 +160,10 @@ Currently ngonx use port 10001 for export a simple api to check all services
 curl http://localhost:10001/api/v1/mngt/
 ```
 
+And you can view on the ngonx-UI SPA
+
+![Service Discovery](/docs/service1.jpeg)
+![Service Discovery](/docs/service2.jpeg)
 
 
 > Start API PoC service
