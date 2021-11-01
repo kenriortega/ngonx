@@ -17,6 +17,27 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// Middleware CORS
+func CORSMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Content-Type", "application/json")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, Access-Control-Request-Headers, Access-Control-Request-Method, Connection, Host, Origin, User-Agent, Referer, Cache-Control, X-header")
+		next.ServeHTTP(w, r)
+	})
+}
+
+// SSE logic
+
+func healthHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+}
+
+func readinessHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+}
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "ngonxctl",
@@ -69,6 +90,12 @@ func StartMngt(config config.Config) {
 	// Routes...
 	adminRoutes := r.PathPrefix("/api/v1/mngt").Subrouter()
 	adminRoutes.HandleFunc("/", mh.GetAllEndpoints).Methods(http.MethodGet)
+	adminRoutes.HandleFunc("/health", healthHandler)
+	adminRoutes.HandleFunc("/readiness", readinessHandler)
+
+	// Realtime options
+	adminRoutes.HandleFunc("/wss", mh.WssocketHandler)
+	r.Use(CORSMiddleware)
 	port := 10_001
 	server := httpsrv.NewServer(
 		"0.0.0.0",
@@ -79,7 +106,7 @@ func StartMngt(config config.Config) {
 	go func() {
 		t := time.NewTicker(time.Second * 30)
 		for range t.C {
-			logger.LogInfo("Starting health check...")
+			// logger.LogInfo("Starting health check...")
 			endpoints, err := service.ListEndpoints()
 			if err != nil {
 				logger.LogError(err.Error())
@@ -97,7 +124,7 @@ func StartMngt(config config.Config) {
 				}
 				mh.UpdateEndpoint(it)
 			}
-			logger.LogInfo("Health check completed")
+			// logger.LogInfo("Health check completed")
 		}
 	}()
 
