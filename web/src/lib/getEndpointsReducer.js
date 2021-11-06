@@ -30,7 +30,7 @@ export const GetEndpointsReducer = (initialState, action) => {
     }
 };
 
-const ROOT_URL = 'http://localhost:10001';
+// const ROOT_URL = 'http://localhost:10001';
 
 export async function getAllEndpoints(dispatch) {
     const requestOptions = {
@@ -40,7 +40,7 @@ export async function getAllEndpoints(dispatch) {
 
     try {
         dispatch({ type: 'ENDPOINTS_REQUEST' });
-        let response = await fetch(`${ROOT_URL}/api/v1/mngt`, requestOptions);
+        let response = await fetch(`/api/v1/mngt/`, requestOptions);
         let data = await response.json();
         if (data.length >= 0) {
 

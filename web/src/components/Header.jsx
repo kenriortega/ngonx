@@ -88,11 +88,11 @@ const MenuLinks = ({ isOpen, colorMode, toggleColorMode }) => {
                 direction={["column", "row", "row", "row"]}
                 pt={[4, 4, 0, 0]}
             >
-                <MenuItem to="/"
+                {/* <MenuItem to="/"
                     className="link-name"
                     textStyle="linkName"
                 > ⚙️ Home
-                </MenuItem>
+                </MenuItem> */}
                 <IconButton
                     aria-label=""
                     mr="4"

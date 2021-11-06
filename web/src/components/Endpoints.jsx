@@ -1,41 +1,41 @@
 import React, { Fragment, useEffect, useReducer, useState } from 'react'
 import EndpointCard from './EndpointCard'
-import { Box, Container, Flex, Heading, Text } from "@chakra-ui/react"
+import { Box, Container, Flex, Heading, Text, Center } from "@chakra-ui/react"
 import { getAllEndpoints, GetEndpointsReducer, initialStateGetAllEndpoints } from '../lib/getEndpointsReducer'
 import { FaIdCard, FaTable } from 'react-icons/fa'
 import EndpointTable from './EndpointTable'
 import NoDataImage from './NoData'
 const Endpoints = () => {
-    // const [{ endpoints, loading, errorMessage }, dispatch] =
-    //     useReducer(GetEndpointsReducer, initialStateGetAllEndpoints)
+    const [{ endpoints, loading, errorMessage }, dispatch] =
+        useReducer(GetEndpointsReducer, initialStateGetAllEndpoints)
 
-    // useEffect(() => {
-    //     async function fetchEndpoints() {
-    //         try {
-    //             let response = await getAllEndpoints(dispatch)
-    //             if (!response) return;
-    //         } catch (error) {
-    //             console.log(error);
-    //         }
-    //     }
-
-    //     fetchEndpoints()
-    // }, [])
-
-    const endpoints = [
-        {
-            id: "6c4fa765-f6bf-4f00-950f-3315f504cc50",
-            path_url: "http://localhost:3000/api/v1/health/",
-            status: "down"
-        },
-        {
-            id: "4abbf98f-8a8c-46ca-a2c5-ae8eaefbef60",
-            path_url: "http://localhost:3000/api/v1/version/",
-            status: "down"
+    useEffect(() => {
+        async function fetchEndpoints() {
+            try {
+                let response = await getAllEndpoints(dispatch)
+                if (!response) return;
+            } catch (error) {
+                console.log(error);
+            }
         }
-    ]
 
-    const loading = false
+        fetchEndpoints()
+    }, [])
+
+    // const endpoints = [
+    //     {
+    //         id: "6c4fa765-f6bf-4f00-950f-3315f504cc50",
+    //         path_url: "http://localhost:3000/api/v1/health/",
+    //         status: "down"
+    //     },
+    //     {
+    //         id: "4abbf98f-8a8c-46ca-a2c5-ae8eaefbef60",
+    //         path_url: "http://localhost:3000/api/v1/version/",
+    //         status: "down"
+    //     }
+    // ]
+
+    // const loading = false
     const [viewElement, setViewElement] = useState(false)
 
     const handleViewElement = () => {
