@@ -38,3 +38,7 @@ grpccli:
 	go run examples/calculator/calc_client/client.go
 releaser:
 	goreleaser release --snapshot --rm-dist
+
+
+build-ui:
+	cd web && yarn build
