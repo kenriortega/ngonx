@@ -270,7 +270,7 @@ curl http://localhost:10001/api/v1/mngt/
   GET | /readiness      
   GET | /wss      
 
-And you can view on the ngonx-UI SPA
+UI on `http://localhost:10001/`
 
 ![Service Discovery](/docs/service1.jpeg)
 ![Service Discovery](/docs/service2.jpeg)
