@@ -1,6 +1,8 @@
 package cli
 
 import (
+	"embed"
+	"io/fs"
 	"net/http"
 	"net/url"
 	"os"
@@ -14,8 +16,12 @@ import (
 	"github.com/kenriortega/ngonx/pkg/healthcheck"
 	"github.com/kenriortega/ngonx/pkg/httpsrv"
 	"github.com/kenriortega/ngonx/pkg/logger"
+	"github.com/rs/cors"
 	"github.com/spf13/cobra"
 )
+
+//go:embed ui
+var frontend embed.FS
 
 // Middleware CORS
 func CORSMiddleware(next http.Handler) http.Handler {
@@ -71,6 +77,14 @@ func initConfig() {
 }
 
 func StartMngt(config config.Config) {
+
+	stripped, err := fs.Sub(frontend, "ui")
+	if err != nil {
+		logger.LogError(err.Error())
+	}
+
+	frontendFS := http.FileServer(http.FS(stripped))
+
 	r := mux.NewRouter()
 	repo := domain.NewMngtRepositoryStorage()
 	service := services.NewMngtService(repo)
@@ -87,16 +101,18 @@ func StartMngt(config config.Config) {
 			mh.RegisterEndpoint(endpointMap)
 		}
 	}
-	// Routes...
-	mngt := r.PathPrefix("/api/v1/mngt").Subrouter()
-	mngt.HandleFunc("/", mh.GetAllEndpoints).Methods(http.MethodGet)
-	mngt.HandleFunc("/health", healthHandler)
-	mngt.HandleFunc("/readiness", readinessHandler)
 
+	mngtAPI := r.PathPrefix("/api/v1/mngt").Subrouter()
+	mngtAPI.HandleFunc("/", mh.GetAllEndpoints)
+	mngtAPI.HandleFunc("/health", healthHandler)
+	mngtAPI.HandleFunc("/readiness", readinessHandler)
 	// Realtime options
-	mngt.HandleFunc("/wss", mh.WssocketHandler)
-	r.Use(CORSMiddleware)
+	mngtAPI.HandleFunc("/wss", mh.WssocketHandler)
+
+	mgntWEB := r.PathPrefix("/")
+	mgntWEB.Handler(http.StripPrefix("/", frontendFS))
 	port := 10_001
+	cors.Default()
 	server := httpsrv.NewServer(
 		"0.0.0.0",
 		port,
