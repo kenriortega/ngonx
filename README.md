@@ -2,6 +2,7 @@
 
 It`s a simple proxy server written with [go](https://github.com/golang/go).
 The core services are based on [nginx](https://github.com/nginx) server, and [traefik](https://github.com/traefik/traefik)
+Our roadmap you can find here [project board](https://piqba.notion.site/f98799ba3d384526ac6591247b12481c?v=4ca0c832682749e99dcc72a66fdd71a1)
 
 ## Features
 
@@ -11,15 +12,12 @@ The core services are based on [nginx](https://github.com/nginx) server, and [tr
 * Run ngonx as a static web server
 * Project collaborative and open source
 
+## Download ngonxctl
+
+Go to last release and download [ngonxctl](https://github.com/kenriortega/ngonx/releases) binary for you OS
+
 ## **nGOnx** commands
 
-> Build
-
-```bash
-make compile
-```
-
-> List of command available
 
 ```bash
 ngonxctl -h
@@ -50,7 +48,27 @@ Use "ngonxctl [command] --help" for more information about a command.
 
 ```
 
-> Yaml file fields
+> Setup cmd
+
+Create the yaml file that contain a generic data
+
+```bash
+Create configuration file it`s doesn`t exist
+
+Usage:
+  ngonxctl setup [flags]
+
+Flags:
+  -h, --help   help for setup
+
+Global Flags:
+  -f, --cfgfile string   File setting.yml (default "ngonx.yaml")
+  -p, --cfgpath string   Config path only  (default "path/binary")
+
+```
+
+> Yaml file with generic data
+
 
 ```yaml
 # Static web server like nginx
@@ -104,7 +122,44 @@ proxy:
             path_protected: true
 ```
 
+
+> Version cmd show Build Time, version hash and version for the current binary
+
+```bash
+Print the version number of ngonxctl
+
+Usage:
+  ngonxctl version [flags]
+
+Flags:
+  -h, --help   help for version
+
+Global Flags:
+  -f, --cfgfile string   File setting.yml (default "ngonx.yaml")
+  -p, --cfgpath string   Config path only  (default "path/binary")
+
+```
+
+
 > Start Proxy server first time
+
+```bash
+Run ngonx as a reverse proxy
+
+Usage:
+  ngonxctl proxy [flags]
+
+Flags:
+      --genkey           Action for generate hash for protected routes
+  -h, --help             help for proxy
+      --port int         Port to serve to run proxy (default 5000)
+      --prevkey string   Action for save a previous hash for protected routes to validate JWT
+
+Global Flags:
+  -f, --cfgfile string   File setting.yml (default "ngonx.yaml")
+  -p, --cfgpath string   Config path only  (default "path/binary")
+
+```
 
 `genkey` command in true generate random secretkey and save on badgerdb on `badger.data`
 
@@ -127,15 +182,63 @@ proxy:
 > Start load balancer
 
 ```bash
+Run ngonx as a load balancer (round robin)
+
+Usage:
+  ngonxctl lb [flags]
+
+Flags:
+      --backends string   Load balanced backends, use commas to separate (default "ngonx.yaml")
+  -h, --help              help for lb
+      --port int          Port to serve to run load balancing  (default 4000)
+
+Global Flags:
+  -f, --cfgfile string   File setting.yml (default "ngonx.yaml")
+  -p, --cfgpath string   Config path only  (default "path/binary")
+
+```
+
+
+```bash
 ./ngonxctl lb --backends "http://localhost:5000,http://localhost:5001,http://localhost:5002"
 ```
 > Start static files server
+
+```bash
+Run ngonx as a static web server
+
+Usage:
+  ngonxctl static [flags]
+
+Flags:
+  -h, --help   help for static
+
+Global Flags:
+  -f, --cfgfile string   File setting.yml (default "ngonx.yaml")
+  -p, --cfgpath string   Config path only  (default "path/binary")
+
+```
 
 ```bash
 ./ngonxctl static
 ```
 
 > Start grpc proxy server
+
+```bash
+Run ngonx as a grpc proxy
+
+Usage:
+  ngonxctl grpc [flags]
+
+Flags:
+  -h, --help   help for grpc
+
+Global Flags:
+  -f, --cfgfile string   File setting.yml (default "ngonx.yaml")
+  -p, --cfgpath string   Config path only  (default "path/binary")
+
+```
 
 ```bash
 ./ngonxctl grpc
@@ -160,11 +263,21 @@ Currently ngonx use port 10001 for export a simple api to check all services
 curl http://localhost:10001/api/v1/mngt/
 ```
 
+  Method   | Path | 
+  ---------|----------------
+  GET | /      
+  GET | /health      
+  GET | /readiness      
+  GET | /wss      
+
 And you can view on the ngonx-UI SPA
 
 ![Service Discovery](/docs/service1.jpeg)
 ![Service Discovery](/docs/service2.jpeg)
 
+
+How to interact with app for testing reasson
+-----
 
 > Start API PoC service
 
@@ -240,6 +353,8 @@ certbot renew
 
 ---
 
+
+> Yaml file fields
 
 BenchMarking
 ------------
