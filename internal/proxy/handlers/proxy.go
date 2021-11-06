@@ -170,7 +170,7 @@ func checkAPIKEYSecretKeyFromRequest(req *http.Request, ph *ProxyHandler, engine
 // modifyResponse modify response
 func modifyResponse(err error) func(*http.Response) error {
 	return func(resp *http.Response) error {
-		resp.Header.Set("X-Proxy", "EgoProxy")
+		resp.Header.Set("X-Proxy", "Ngonx")
 
 		if err != nil {
 			return err
