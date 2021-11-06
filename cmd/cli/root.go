@@ -88,13 +88,13 @@ func StartMngt(config config.Config) {
 		}
 	}
 	// Routes...
-	adminRoutes := r.PathPrefix("/api/v1/mngt").Subrouter()
-	adminRoutes.HandleFunc("/", mh.GetAllEndpoints).Methods(http.MethodGet)
-	adminRoutes.HandleFunc("/health", healthHandler)
-	adminRoutes.HandleFunc("/readiness", readinessHandler)
+	mngt := r.PathPrefix("/api/v1/mngt").Subrouter()
+	mngt.HandleFunc("/", mh.GetAllEndpoints).Methods(http.MethodGet)
+	mngt.HandleFunc("/health", healthHandler)
+	mngt.HandleFunc("/readiness", readinessHandler)
 
 	// Realtime options
-	adminRoutes.HandleFunc("/wss", mh.WssocketHandler)
+	mngt.HandleFunc("/wss", mh.WssocketHandler)
 	r.Use(CORSMiddleware)
 	port := 10_001
 	server := httpsrv.NewServer(
@@ -106,7 +106,7 @@ func StartMngt(config config.Config) {
 	go func() {
 		t := time.NewTicker(time.Second * 30)
 		for range t.C {
-			// logger.LogInfo("Starting health check...")
+
 			endpoints, err := service.ListEndpoints()
 			if err != nil {
 				logger.LogError(err.Error())
@@ -124,7 +124,7 @@ func StartMngt(config config.Config) {
 				}
 				mh.UpdateEndpoint(it)
 			}
-			// logger.LogInfo("Health check completed")
+
 		}
 	}()
 
