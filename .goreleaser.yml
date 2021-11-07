@@ -55,6 +55,19 @@ checksum:
   name_template: 'checksums.txt'
 snapshot:
   name_template: "{{ incpatch .Version }}-next"
+# For docker release
+dockers:
+  -
+    image_templates:
+    - "kenriortega/ngonx:{{ .Tag }}"
+    - "kenriortega/ngonx:v{{ .Major }}"
+    - "kenriortega/ngonx:v{{ .Major }}.{{ .Minor }}"
+    - "kenriortega/ngonx:latest"
+    skip_push: true
+
+    # Path to the Dockerfile (from the project root).
+    dockerfile: Dockerfile.goreleaser
+    use: docker
 changelog:
   sort: asc
   filters:
