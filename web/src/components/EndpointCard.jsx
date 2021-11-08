@@ -6,9 +6,9 @@ const EndpointCard = ({ id, path_url, status }) => {
     return (
         <>
             <span className={"card"} >
-                <Box w="500" >
+                <Box w="500" color={status === "down" ? "red" : "green"}>
 
-                    <h1>{status ? `☠️ Down` : `✅ UP`}</h1>
+                    <h1>{status === "down" ? `☠️ Down` : `✅ UP`}</h1>
                     <h3>Path: {pathname}</h3>
                     <h4>Host: {hostname}</h4>
 
