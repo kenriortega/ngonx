@@ -11,7 +11,7 @@ import {
 } from "@chakra-ui/react";
 import Logo from "./Logo";
 import { FaSun, FaMoon, FaBars } from 'react-icons/fa'
-import { useStylesApp } from "../hooks/useStyleApp";
+import { useStylesApp } from "../hooks";
 const NavBar = (props) => {
     const [isOpen, setIsOpen] = React.useState(false);
     const toggle = () => setIsOpen(!isOpen);
