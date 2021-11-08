@@ -39,6 +39,8 @@ grpccli:
 releaser:
 	goreleaser release --snapshot --rm-dist
 
+run-ui:
+	cd web && yarn dev
 
 build-ui:
 	cd web && yarn build
