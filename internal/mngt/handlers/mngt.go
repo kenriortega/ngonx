@@ -17,6 +17,7 @@ var (
 		ReadBufferSize:    1024,
 		WriteBufferSize:   1024,
 		EnableCompression: false,
+		CheckOrigin:       func(*http.Request) bool { return true },
 	}
 )
 
@@ -76,6 +77,7 @@ func writeResponse(w http.ResponseWriter, code int, data interface{}) {
 }
 
 func (mh MngtHandler) WssocketHandler(w http.ResponseWriter, r *http.Request) {
+
 	query := r.URL.Query()
 	ds := query.Get("ds")
 	if ds == "" {
@@ -89,6 +91,7 @@ func (mh MngtHandler) WssocketHandler(w http.ResponseWriter, r *http.Request) {
 	defer c.Close()
 
 	for {
+
 		mt, message, err := c.ReadMessage()
 		if err != nil {
 			log.Println("read:", err)
@@ -105,26 +108,24 @@ func (mh MngtHandler) WssocketHandler(w http.ResponseWriter, r *http.Request) {
 				}
 				err = c.WriteMessage(mt, bytes)
 				if err != nil {
-					log.Println("write:", err)
+					log.Println("write endpoints:", err)
 
 				}
 				durations, err := time.ParseDuration(ds)
 				if err != nil {
 					err = c.WriteMessage(mt, []byte(err.Error()))
 					if err != nil {
-						log.Println("write:", err)
-
+						log.Println("write durations:", err)
 					}
 				}
 				time.Sleep(durations)
 			}
+
 		default:
 			err = c.WriteMessage(mt, []byte("CMD not found"))
 			if err != nil {
-				log.Println("write:", err)
-
+				log.Println("write default:", err)
 			}
 		}
-
 	}
 }
