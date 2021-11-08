@@ -25,14 +25,14 @@ const EndpointTable = ({ endpoints, onSelectedRow }) => {
 				<Tbody>
 					{endpoints.map((endpoint) => (
 						<Tr onClick={() => onSelectedRow(endpoint)} key={endpoint.id}>
-							<Td cursor="pointer" color="green">
-								<Tooltip label="go to ..." placement="left">
+							<Td cursor="pointer" color={endpoint.status === "down" ? "red" : "green"}>
+								<Tooltip label={endpoint.path_url} placement="left">
 									{endpoint.id.split("-")[0]}
 								</Tooltip>
 							</Td>
 
 							<Td>{urlParse(endpoint.path_url).pathname}</Td>
-							<Td>{endpoint.status ? "☠️ down" : "✅ up"}</Td>
+							<Td>{endpoint.status === "down" ? "☠️ down" : "✅ up"}</Td>
 						</Tr>
 					))}
 				</Tbody>
