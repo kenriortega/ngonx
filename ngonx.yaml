@@ -47,3 +47,9 @@ proxy:
           - path_endpoints: /api/v1/version/
             path_proxy: /version/
             path_protected: true
+      - name: microB
+        host_uri: http://localhost:4000
+        endpoints:
+          - path_endpoints: /api/v1/health/
+            path_proxy: /ready/
+            path_protected: false
