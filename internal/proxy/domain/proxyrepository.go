@@ -2,8 +2,6 @@ package proxy
 
 import (
 	"context"
-	"fmt"
-	"os"
 
 	badger "github.com/dgraph-io/badger/v3"
 	"github.com/go-redis/redis/v8"
@@ -41,39 +39,39 @@ func (r ProxyRepositoryStorage) SaveKEY(engine, key, apikey string) error {
 				logger.LogError(errors.ErrSavekeyUpdateTX.Error())
 				return errors.ErrSavekeyUpdateTX
 			}
-			logger.LogInfo("savekey: successful")
+			logger.LogInfo("proxy: savekey was successful")
 
 			return nil
 		}); err != nil {
-			logger.LogError(errors.ErrSavekeyUpdate.Error())
+
 			return errors.ErrSavekeyUpdate
 		}
 
 		return nil
 	case "redis":
 		if _, err := r.clientRdb.HSet(context.TODO(), key, apikey).Result(); err != nil {
-			logger.LogError(err.Error())
+			logger.LogError(errors.Errorf("proxy redis: %v", err).Error())
 		}
 		// r.clientRdb.Expire(context.TODO(), key, 24*time.Hour)
-	case "local":
-		f, err := os.Create("./apikey")
+		// case "local":
+		// 	f, err := os.Create("./apikey")
 
-		if err != nil {
-			logger.LogError(errors.ErrSavekeyCreateLocal.Error())
-			return errors.ErrSavekeyCreateLocal
-		}
+		// 	if err != nil {
+		// 		logger.LogError(errors.ErrSavekeyCreateLocal.Error())
+		// 		return errors.ErrSavekeyCreateLocal
+		// 	}
 
-		// defer f.Close()
+		// 	// defer f.Close()
 
-		data := []byte(fmt.Sprintf("%s:%s", key, apikey))
+		// 	data := []byte(fmt.Sprintf("%s:%s", key, apikey))
 
-		_, err = f.Write(data)
+		// 	_, err = f.Write(data)
 
-		if err != nil {
-			logger.LogError(errors.ErrSavekeyWriteOnLocal.Error())
-			return errors.ErrSavekeyWriteOnLocal
-		}
-		return nil
+		// 	if err != nil {
+		// 		logger.LogError(errors.ErrSavekeyWriteOnLocal.Error())
+		// 		return errors.ErrSavekeyWriteOnLocal
+		// 	}
+		// 	return nil
 	}
 	return nil
 }
