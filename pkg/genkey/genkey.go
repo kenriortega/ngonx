@@ -33,7 +33,8 @@ func ApiKeyGenerator(word string) string {
 	h := sha256.New()
 	_, err := h.Write([]byte(word))
 	if err != nil {
-		logger.LogError(errors.ErrApiKeyGenerator.Error())
+		logger.LogError(errors.Errorf("genkeypkg: %v", errors.ErrApiKeyGenerator).Error())
+
 	}
 	return fmt.Sprintf("%x", h.Sum(nil))
 }
