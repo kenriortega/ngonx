@@ -14,6 +14,7 @@ import (
 
 	handlers "github.com/kenriortega/ngonx/internal/proxy/handlers"
 	"github.com/kenriortega/ngonx/pkg/backoff"
+	"github.com/kenriortega/ngonx/pkg/errors"
 	"github.com/kenriortega/ngonx/pkg/logger"
 	"github.com/spf13/cobra"
 )
@@ -30,14 +31,14 @@ var lbCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		port, err := cmd.Flags().GetInt(flagPort)
 		if err != nil {
-			logger.LogError(err.Error())
+			logger.LogError(errors.Errorf("lb: %v", err).Error())
 		}
 		serverList, err := cmd.Flags().GetString(flagServerList)
 		if err != nil {
 			log.Fatalf(err.Error())
 		}
 		if len(serverList) == 0 {
-			log.Fatal("Please provide one or more backends to load balance")
+			logger.LogError(errors.Errorf("lb: provide one or more backends to load balance %v", err).Error())
 		}
 
 		// parse servers
@@ -45,12 +46,12 @@ var lbCmd = &cobra.Command{
 		for _, tok := range tokens {
 			serverUrl, err := url.Parse(tok)
 			if err != nil {
-				logger.LogError(err.Error())
+				logger.LogError(errors.Errorf("lb: %v", err).Error())
 			}
 
 			proxy := httputil.NewSingleHostReverseProxy(serverUrl)
 			proxy.ErrorHandler = func(writer http.ResponseWriter, request *http.Request, e error) {
-				logger.LogInfo(fmt.Sprintf("[%s] %s\n", serverUrl.Host, e.Error()))
+				logger.LogInfo(fmt.Sprintf("lb: %s %s\n", serverUrl.Host, e.Error()))
 				retry := handlers.GetRetryFromContext(request)
 
 				if retry < 3 {
@@ -66,7 +67,7 @@ var lbCmd = &cobra.Command{
 
 				// if the same request routing for few attempts with different backends, increase the count
 				attempts := handlers.GetAttemptsFromContext(request)
-				logger.LogInfo(fmt.Sprintf("%s(%s) Attempting retry %d\n", request.RemoteAddr, request.URL.Path, attempts))
+				logger.LogInfo(fmt.Sprintf("lb: %s(%s) Attempting retry %d\n", request.RemoteAddr, request.URL.Path, attempts))
 				ctx := context.WithValue(request.Context(), domain.ATTEMPTS, attempts+1)
 				handlers.Lbalancer(writer, request.WithContext(ctx))
 			}
@@ -76,7 +77,7 @@ var lbCmd = &cobra.Command{
 				Alive:        true,
 				ReverseProxy: proxy,
 			})
-			logger.LogInfo(fmt.Sprintf("Configured server: %s\n", serverUrl))
+			logger.LogInfo(fmt.Sprintf("lb: configured server: %s\n", serverUrl))
 		}
 
 		// create http server
@@ -88,9 +89,9 @@ var lbCmd = &cobra.Command{
 		// start health checking
 		go handlers.HealthCheck()
 
-		logger.LogInfo(fmt.Sprintf("Load Balancer started at :%d\n", port))
+		logger.LogInfo(fmt.Sprintf("lb: Load Balancer started at :%d\n", port))
 		if err := server.ListenAndServe(); err != nil {
-			logger.LogError(err.Error())
+			logger.LogError(errors.Errorf("lb: %v", err).Error())
 		}
 
 	},
