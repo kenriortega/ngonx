@@ -9,15 +9,12 @@ import (
 var log *zap.Logger
 
 func init() {
-	// var err error
-	// config := zap.NewProductionConfig()
+
 	encoderConfig := zap.NewProductionEncoderConfig()
 	encoderConfig.TimeKey = "timestamp"
 	encoderConfig.StacktraceKey = ""
 	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 
-	// lumberjack.Logger is already safe for concurrent use, so we don't need to
-	// lock it.
 	w := zapcore.AddSync(&lumberjack.Logger{
 		Filename:   "./ngonx-log/ngonx.log",
 		MaxSize:    500, // megabytes
