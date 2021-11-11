@@ -33,7 +33,7 @@ func GetRetryFromContext(r *http.Request) int {
 func Lbalancer(w http.ResponseWriter, r *http.Request) {
 	attempts := GetAttemptsFromContext(r)
 	if attempts > 3 {
-		logger.LogInfo(fmt.Sprintf("%s(%s) Max attempts reached, terminating\n", r.RemoteAddr, r.URL.Path))
+		logger.LogInfo(fmt.Sprintf("lb: %s(%s) Max attempts reached, terminating\n", r.RemoteAddr, r.URL.Path))
 		http.Error(w, errors.ErrLBHttp.Error(), http.StatusServiceUnavailable)
 		return
 	}
@@ -50,8 +50,7 @@ func Lbalancer(w http.ResponseWriter, r *http.Request) {
 func HealthCheck() {
 	t := time.NewTicker(time.Minute * 1)
 	for range t.C {
-		logger.LogInfo("Starting health check...")
 		ServerPool.HealthCheck()
-		logger.LogInfo("Health check completed")
+		logger.LogInfo("lb: Health check completed")
 	}
 }

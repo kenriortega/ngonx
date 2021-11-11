@@ -37,3 +37,5 @@ build
 *.pem
 *.csr
 dist
+ngonx-log
+observability

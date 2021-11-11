@@ -3,6 +3,7 @@ package mngt
 import (
 	"encoding/json"
 
+	"github.com/kenriortega/ngonx/pkg/errors"
 	"github.com/kenriortega/ngonx/pkg/logger"
 	uuid "github.com/satori/go.uuid"
 )
@@ -31,12 +32,14 @@ func NewEnpoint(pathUrl, status string) Endpoint {
 func (ed *Endpoint) FromMapToJSON(data map[string]interface{}) {
 	b, err := json.Marshal(data)
 	if err != nil {
-		logger.LogError(err.Error())
+		logger.LogError(errors.Errorf("ngonx mngt: :%v", err).Error())
+
 	}
 
 	err = json.Unmarshal(b, &ed)
 	if err != nil {
-		logger.LogError(err.Error())
+		logger.LogError(errors.Errorf("ngonx mngt: :%v", err).Error())
+
 	}
 }
 func (ed *Endpoint) ToMAP() (toHashMap map[string]interface{}, err error) {

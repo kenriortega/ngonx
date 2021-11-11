@@ -5,6 +5,7 @@ import (
 	handlers "github.com/kenriortega/ngonx/internal/proxy/handlers"
 	services "github.com/kenriortega/ngonx/internal/proxy/services"
 	"github.com/kenriortega/ngonx/pkg/badgerdb"
+	"github.com/kenriortega/ngonx/pkg/errors"
 	"github.com/kenriortega/ngonx/pkg/genkey"
 	"github.com/kenriortega/ngonx/pkg/httpsrv"
 	"github.com/kenriortega/ngonx/pkg/logger"
@@ -18,15 +19,15 @@ var proxyCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		port, err := cmd.Flags().GetInt(flagPort)
 		if err != nil {
-			logger.LogError(err.Error())
+			logger.LogError(errors.Errorf("proxy: %v", err).Error())
 		}
 		generateApiKey, err := cmd.Flags().GetBool(flagGenApiKey)
 		if err != nil {
-			logger.LogError(err.Error())
+			logger.LogError(errors.Errorf("proxy: %v", err).Error())
 		}
 		prevKey, err := cmd.Flags().GetString(flagPrevKey)
 		if err != nil {
-			logger.LogError(err.Error())
+			logger.LogError(errors.Errorf("proxy: %v", err).Error())
 		}
 		// Exporter Metrics
 		go metric.ExposeMetricServer(configFromYaml.ProxyGateway.PortExporterProxy)
@@ -47,16 +48,16 @@ var proxyCmd = &cobra.Command{
 			apiKey := genkey.ApiKeyGenerator(word)
 			_, err := h.Service.SaveSecretKEY(engine, key, apiKey)
 			if err != nil {
-				logger.LogError("genkey: Failed " + err.Error())
+				logger.LogError(errors.Errorf("proxy: failed genkey cmd %v", err).Error())
 			}
-			logger.LogInfo("genkey: Susscefull")
+			logger.LogInfo("proxy: genkey cmd was susscefull")
 		}
 		if prevKey != "" {
 			_, err := h.Service.SaveSecretKEY(engine, key, prevKey)
 			if err != nil {
-				logger.LogError("prevKey: Failed " + err.Error())
+				logger.LogError(errors.Errorf("proxy: failed prevKey cmd %v", err).Error())
 			}
-			logger.LogInfo("prevKey: Susscefull")
+			logger.LogInfo("proxy: prevKey cmd was Susscefull")
 		}
 
 		for _, endpoints := range configFromYaml.ProxyGateway.EnpointsProxy {

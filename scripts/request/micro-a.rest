@@ -1,15 +1,15 @@
 ### Micro A
 
-GET http://localhost:3000/api/v1/health/
+GET http://localhost:3001/api/v1/health/
 
 ###
 
-GET http://localhost:3000/api/v1/version/
+GET http://localhost:3001/api/v1/version/
 
 
 ### Gateway Proxy
 
-GET http://localhost:8080/version/
+GET http://localhost:35000/health/
 ###
 
 GET https://localhost:30443/health/
@@ -21,12 +21,12 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJCYW5rIiwic
 
 ### Proxy
 
-GET http://localhost:30000/version/
+GET http://localhost:35000/version/
 Authorization: Bearerx eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJCYW5rIiwic3ViIjoiU3lzdGVtQXBwIiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo4MDAwIiwiZXhwIjoxNjI0ODk3ODQ4LCJuYmYiOjE2MjQ4OTkwNDgsImlhdCI6MTYyNDg5NzI0OCwianRpIjoiYXV0aC1zZXJ2ZXItMSIsIlVzZXJuYW1lIjoiTUFkbWluIiwiUm9sZSI6IkFETUlOIn0.TJn1Luy6jFsuRiQN0fAJYYQTxYWnO1wgWAUTGThY1Gg
 
 
 ###
-GET http://localhost:30000/version/
+GET http://localhost:35000/version/
 X-API-KEY: 6d5cdc4a5e51f11da6561b8e02bcbe3e4979066c7f9e71e780f15e23dd0f34ee
 
 ### SSL

@@ -14,7 +14,8 @@ func IsBackendAlive(u *url.URL) bool {
 	timeout := 2 * time.Second
 	conn, err := net.DialTimeout("tcp", u.Host, timeout)
 	if err != nil {
-		logger.LogError(errors.ErrIsBackendAlive.Error())
+		logger.LogError(errors.Errorf("healtcheck: %v", errors.ErrIsBackendAlive).Error())
+
 		return false
 	}
 	_ = conn.Close()

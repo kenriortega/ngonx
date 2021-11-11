@@ -1,25 +1,45 @@
 package logger
 
 import (
+	"os"
+
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
+
+func GetEnv(key, fallback string) string {
+	if value, ok := os.LookupEnv(key); ok {
+		return value
+	}
+	return fallback
+}
 
 var log *zap.Logger
 
 func init() {
-	var err error
 	config := zap.NewProductionConfig()
 	encoderConfig := zap.NewProductionEncoderConfig()
 	encoderConfig.TimeKey = "timestamp"
+	encoderConfig.CallerKey = "caller"
 	encoderConfig.StacktraceKey = ""
 	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
+	encoderConfig.EncodeCaller = zapcore.ShortCallerEncoder
 	config.EncoderConfig = encoderConfig
 
-	log, err = config.Build(zap.AddCallerSkip(1))
-	if err != nil {
-		panic(err)
-	}
+	w := zapcore.AddSync(&lumberjack.Logger{
+		Filename:   GetEnv(os.Getenv("NGONX_LOGS"), "./ngonx-log/ngonx.log"),
+		MaxSize:    500, // megabytes
+		MaxBackups: 3,
+		MaxAge:     28, // days
+	})
+
+	core := zapcore.NewCore(
+		zapcore.NewConsoleEncoder(config.EncoderConfig),
+		w,
+		zap.InfoLevel,
+	)
+	log = zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1))
 }
 
 // LogInfo wrap for log.info

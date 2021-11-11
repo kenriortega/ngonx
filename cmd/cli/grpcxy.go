@@ -3,13 +3,13 @@ package cli
 import (
 	"context"
 	"fmt"
-	"log"
 	"net"
 	"os"
 	"os/signal"
 	"strings"
 	"time"
 
+	"github.com/kenriortega/ngonx/pkg/errors"
 	"github.com/kenriortega/ngonx/pkg/logger"
 	"github.com/spf13/cobra"
 	"github.com/talos-systems/grpc-proxy/proxy"
@@ -29,7 +29,7 @@ var grpcCmd = &cobra.Command{
 
 		lis, err := net.Listen("tcp", configFromYaml.GrpcProxy.Listener)
 		if err != nil {
-			log.Fatalf("failed to listen: %v", err)
+			logger.LogError(errors.Errorf("grpc: failed to listen: %v", err).Error())
 		}
 
 		logger.LogInfo(fmt.Sprintf("Proxy running at %q\n", configFromYaml.GrpcProxy.Listener))
@@ -43,7 +43,7 @@ var grpcCmd = &cobra.Command{
 						creds, sslErr := credentials.NewClientTLSFromFile(
 							configFromYaml.GrpcClientCert, "")
 						if sslErr != nil {
-							log.Fatalf("Failed to parse credentials: %v", sslErr)
+							logger.LogError(errors.Errorf("grpc: failed to parse credentials: %v", sslErr).Error())
 						}
 						conn, err := grpc.DialContext(
 							ctx,
@@ -94,7 +94,7 @@ var grpcCmd = &cobra.Command{
 				configFromYaml.GrpcSSL.KeyFile,
 			)
 			if sslErr != nil {
-				log.Fatalf("Failed to parse credentials: %v", sslErr)
+				logger.LogError(errors.Errorf("grpc: failed to parse credentials: %v", sslErr).Error())
 				return
 			}
 			opts = append(opts, grpc.Creds(creds))
@@ -104,7 +104,7 @@ var grpcCmd = &cobra.Command{
 
 		go gracefulShutdown(server)
 		if err := server.Serve(lis); err != nil {
-			log.Fatalf("failed to serve: %v", err)
+			logger.LogError(errors.Errorf("grpc: failed to serve: %v", err).Error())
 		}
 	},
 }
@@ -119,11 +119,12 @@ func gracefulShutdown(server *grpc.Server) {
 
 	signal.Notify(quit, os.Interrupt)
 	sig := <-quit
-	logger.LogInfo(fmt.Sprintf("server is shutting down %s", sig.String()))
+	logger.LogWarn(fmt.Sprintf("grpc: server is shutting down %s", sig.String()))
 
 	_, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
 	server.GracefulStop()
-	logger.LogInfo("server stopped")
+	logger.LogWarn(fmt.Sprintf("grpc: server is shutting down %s", sig.String()))
+
 }
