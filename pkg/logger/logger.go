@@ -9,11 +9,14 @@ import (
 var log *zap.Logger
 
 func init() {
-
+	config := zap.NewProductionConfig()
 	encoderConfig := zap.NewProductionEncoderConfig()
 	encoderConfig.TimeKey = "timestamp"
+	encoderConfig.CallerKey = "caller"
 	encoderConfig.StacktraceKey = ""
 	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
+	encoderConfig.EncodeCaller = zapcore.ShortCallerEncoder
+	config.EncoderConfig = encoderConfig
 
 	w := zapcore.AddSync(&lumberjack.Logger{
 		Filename:   "./ngonx-log/ngonx.log",
@@ -21,13 +24,13 @@ func init() {
 		MaxBackups: 3,
 		MaxAge:     28, // days
 	})
+
 	core := zapcore.NewCore(
-		zapcore.NewConsoleEncoder(encoderConfig),
+		zapcore.NewConsoleEncoder(config.EncoderConfig),
 		w,
 		zap.InfoLevel,
 	)
-	log = zap.New(core)
-
+	log = zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1))
 }
 
 // LogInfo wrap for log.info
