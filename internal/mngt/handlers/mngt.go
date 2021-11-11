@@ -2,13 +2,13 @@ package mngt
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"time"
 
 	"github.com/gorilla/websocket"
 	domain "github.com/kenriortega/ngonx/internal/mngt/domain"
 	services "github.com/kenriortega/ngonx/internal/mngt/services"
+	"github.com/kenriortega/ngonx/pkg/errors"
 	"github.com/kenriortega/ngonx/pkg/logger"
 )
 
@@ -36,7 +36,8 @@ func (mh MngtHandler) GetAllEndpoints(w http.ResponseWriter, r *http.Request) {
 	endpoints, err := mh.service.ListEndpoints()
 
 	if err != nil {
-		logger.LogError("handler: " + err.Error())
+		logger.LogError(errors.Errorf("ngonx mngt: :%v", err).Error())
+
 		writeResponse(w, http.StatusInternalServerError, err)
 
 	}
@@ -53,7 +54,7 @@ func (mh MngtHandler) RegisterEndpoint(data map[string]interface{}) {
 	endpoint.FromMapToJSON(data)
 	err := mh.service.RegisterEndpoint(endpoint)
 	if err != nil {
-		logger.LogError(err.Error())
+		logger.LogError(errors.Errorf("ngonx mngt: :%v", err).Error())
 	}
 }
 
@@ -61,7 +62,7 @@ func (mh MngtHandler) UpdateEndpoint(endpoint domain.Endpoint) {
 
 	err := mh.service.UpdateEndpoint(endpoint)
 	if err != nil {
-		logger.LogError(err.Error())
+		logger.LogError(errors.Errorf("ngonx mngt: :%v", err).Error())
 	}
 }
 
@@ -71,7 +72,7 @@ func writeResponse(w http.ResponseWriter, code int, data interface{}) {
 	w.Header().Add("Content-Type", "application/json")
 	err := json.NewEncoder(w).Encode(data)
 	if err != nil {
-		logger.LogError(err.Error())
+		logger.LogError(errors.Errorf("ngonx mngt: :%v", err).Error())
 	}
 
 }
@@ -85,7 +86,7 @@ func (mh MngtHandler) WssocketHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	c, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Print("upgrade:", err)
+		logger.LogError(errors.Errorf("ngonx mngt:  upgrade ws :%v", err).Error())
 		return
 	}
 	defer c.Close()
@@ -94,7 +95,7 @@ func (mh MngtHandler) WssocketHandler(w http.ResponseWriter, r *http.Request) {
 
 		mt, message, err := c.ReadMessage()
 		if err != nil {
-			log.Println("read:", err)
+			logger.LogError(errors.Errorf("ngonx mngt:  read ws :%v", err).Error())
 			break
 		}
 		switch string(message) {
@@ -104,18 +105,17 @@ func (mh MngtHandler) WssocketHandler(w http.ResponseWriter, r *http.Request) {
 				endpoints, _ := mh.service.ListEndpoints()
 				bytes, err := json.Marshal(endpoints)
 				if err != nil {
-					log.Fatal(err)
+					logger.LogError(errors.Errorf("ngonx mngt:  ws :%v", err).Error())
 				}
 				err = c.WriteMessage(mt, bytes)
 				if err != nil {
-					log.Println("write endpoints:", err)
-
+					logger.LogError(errors.Errorf("ngonx mngt: write endpoints ws :%v", err).Error())
 				}
 				durations, err := time.ParseDuration(ds)
 				if err != nil {
 					err = c.WriteMessage(mt, []byte(err.Error()))
 					if err != nil {
-						log.Println("write durations:", err)
+						logger.LogError(errors.Errorf("ngonx mngt: write durations ws :%v", err).Error())
 					}
 				}
 				time.Sleep(durations)
@@ -124,7 +124,7 @@ func (mh MngtHandler) WssocketHandler(w http.ResponseWriter, r *http.Request) {
 		default:
 			err = c.WriteMessage(mt, []byte("CMD not found"))
 			if err != nil {
-				log.Println("write default:", err)
+				logger.LogError(errors.Errorf("ngonx mngt: write default ws :%v", err).Error())
 			}
 		}
 	}

@@ -140,7 +140,8 @@ proxy:
             path_protected: true
 `
 	if err != nil {
-		logger.LogError(errors.ErrCreatingSettingFile.Error())
+		logger.LogError(errors.Errorf("config: %v", errors.ErrCreatingSettingFile).Error())
+
 	}
 
 	// defer f.Close()
@@ -150,6 +151,7 @@ proxy:
 	_, err = f.Write(data)
 
 	if err != nil {
-		logger.LogError(errors.ErrWritingSettingFile.Error())
+		logger.LogError(errors.Errorf("config: %v", errors.ErrWritingSettingFile).Error())
+
 	}
 }

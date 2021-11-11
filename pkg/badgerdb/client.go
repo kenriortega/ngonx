@@ -2,6 +2,7 @@ package badgerdb
 
 import (
 	badger "github.com/dgraph-io/badger/v3"
+	"github.com/kenriortega/ngonx/pkg/errors"
 	"github.com/kenriortega/ngonx/pkg/logger"
 )
 
@@ -20,7 +21,7 @@ func GetBadgerDB(embedMem bool) *badger.DB {
 
 	db, err := badger.Open(opt)
 	if err != nil {
-		logger.LogError(err.Error())
+		logger.LogError(errors.Errorf("badger: %v", err).Error())
 
 		panic(err)
 	}

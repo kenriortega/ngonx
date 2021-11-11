@@ -9,7 +9,7 @@ var (
 	ErrCreatingSettingFile = NewError("security: error on create setting file")
 	ErrWritingSettingFile  = NewError("security: error on write setting file")
 	// loadbalancer
-	ErrIsBackendAlive = NewError("lb: Site unreachcable dial tcp")
+	ErrIsBackendAlive = NewError("ngonx healthcheck: Site unreachcable dial tcp")
 	// repositoryDB
 	ErrSavekeyUpdateTX     = NewError("badgerdb: error executing TX to save apikey")
 	ErrSavekeyUpdate       = NewError("badgerdb: error to save apikey")
@@ -19,7 +19,7 @@ var (
 	ErrGetkeyValue         = NewError("baderdb: error executing get item value")
 	ErrGetkeyView          = NewError("baderdb: error executing get view")
 	// lbHandler
-	ErrLBHttp              = NewError("lbHandler: error service not availeble")
+	ErrLBHttp              = NewError("lb: error service not availeble")
 	ErrBearerTokenFormat   = NewError("proxyHandler: error Format is Authorization: Bearer [token]")
 	ErrTokenExpValidation  = NewError("proxyHandler: error token expired")
 	ErrTokenHMACValidation = NewError("proxyHandler: error HMAC verification failed")

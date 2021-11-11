@@ -1,8 +1,8 @@
 package cli
 
 import (
-	"log"
-
+	"github.com/kenriortega/ngonx/pkg/errors"
+	"github.com/kenriortega/ngonx/pkg/logger"
 	"github.com/spf13/cobra"
 )
 
@@ -12,7 +12,8 @@ var setupCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		settingsFile, err := cmd.Flags().GetString(flagCfgFile)
 		if err != nil {
-			log.Fatalf(err.Error())
+			logger.LogError(errors.Errorf("ngonx: :%v", err).Error())
+
 		}
 		configFromYaml.CreateSettingFile(settingsFile)
 

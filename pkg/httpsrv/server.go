@@ -9,6 +9,7 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/kenriortega/ngonx/pkg/errors"
 	"github.com/kenriortega/ngonx/pkg/logger"
 )
 
@@ -57,31 +58,27 @@ func NewServerSSL(host string, port int, mux http.Handler) *server {
 
 // Start runs ListenAndServe on the http.Server with graceful shutdown
 func (srv *server) Start() {
-	logger.LogInfo("starting server...")
+	logger.LogInfo("ngonx: starting server...")
 
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			logger.LogError(
-				fmt.Sprintf("could not listen on %s due to %s", srv.Addr, err.Error()),
-			)
+			logger.LogError(errors.Errorf("could not listen on %s due to %s", srv.Addr, err).Error())
 		}
 	}()
-	logger.LogInfo(fmt.Sprintf("server is ready to handle requests %s", srv.Addr))
+	logger.LogInfo(fmt.Sprintf("ngonx: server is ready to handle requests %s", srv.Addr))
 	srv.gracefulShutdown()
 }
 
 // Start runs ListenAndServe on the http.Server with graceful shutdown
 func (srv *server) StartSSL(crt, key string) {
-	logger.LogInfo("starting server...")
+	logger.LogInfo("ngonx: starting server...")
 
 	go func() {
 		if err := srv.ListenAndServeTLS(crt, key); err != nil && err != http.ErrServerClosed {
-			logger.LogError(
-				fmt.Sprintf("could not listen on %s due to %s", srv.Addr, err.Error()),
-			)
+			logger.LogError(errors.Errorf("could not listen on %s due to %s", srv.Addr, err).Error())
 		}
 	}()
-	logger.LogInfo(fmt.Sprintf("server is ready to handle requests %s", srv.Addr))
+	logger.LogInfo(fmt.Sprintf("ngonx: server is ready to handle requests %s", srv.Addr))
 	srv.gracefulShutdown()
 }
 
@@ -90,16 +87,15 @@ func (srv *server) gracefulShutdown() {
 
 	signal.Notify(quit, os.Interrupt)
 	sig := <-quit
-	logger.LogInfo(fmt.Sprintf("server is shutting down %s", sig.String()))
+	logger.LogInfo(fmt.Sprintf("ngonx: server is shutting down %s", sig.String()))
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
 	srv.SetKeepAlivesEnabled(false)
 	if err := srv.Shutdown(ctx); err != nil {
-		logger.LogError(
-			fmt.Sprintf("could not gracefully shutdown the server %s", err.Error()),
-		)
+		logger.LogError(errors.Errorf("could not gracefully shutdown the server %s", err).Error())
+
 	}
-	logger.LogInfo("server stopped")
+	logger.LogInfo("ngonx: server stopped")
 }

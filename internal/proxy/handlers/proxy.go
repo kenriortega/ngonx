@@ -41,9 +41,9 @@ type ProxyHandler struct {
 func (ph *ProxyHandler) SaveSecretKEY(engine, key, apikey string) {
 	result, err := ph.Service.SaveSecretKEY(engine, key, apikey)
 	if err != nil {
-		logger.LogInfo(result)
+		logger.LogError(errors.Errorf("proxy: SaveSecretKEY %v", err).Error())
 	}
-	logger.LogInfo(result)
+	logger.LogInfo("proxy: SaveSecretKEY" + result)
 }
 
 // ProxyGateway handler for management all request
@@ -54,7 +54,8 @@ func (ph *ProxyHandler) ProxyGateway(endpoints domain.ProxyEndpoint, engine, key
 			fmt.Sprintf("%s%s", endpoints.HostURI, endpoint.PathEndpoint),
 		)
 		if err != nil {
-			logger.LogError(err.Error())
+			logger.LogError(errors.Errorf("proxy: %v", err).Error())
+
 		}
 		if endpoint.PathProtected {
 			proxy = httputil.NewSingleHostReverseProxy(target)
@@ -130,21 +131,26 @@ func checkJWTSecretKeyFromRequest(req *http.Request, key string) error {
 	hs := jwt.NewHS256([]byte(key))
 	now := time.Now()
 	if !strings.HasPrefix(header, "Bearer ") {
-		logger.LogError(errors.ErrBearerTokenFormat.Error())
+		logger.LogError(errors.Errorf("proxy: %v", errors.ErrBearerTokenFormat).Error())
+
 		return errors.ErrBearerTokenFormat
 	}
+
 	token := strings.Split(header, " ")[1]
 	pl := JWTPayload{}
 	expValidator := jwt.ExpirationTimeValidator(now)
 	validatePayload := jwt.ValidatePayload(&pl.Payload, expValidator)
+
 	_, err := jwt.Verify([]byte(token), hs, &pl, validatePayload)
 
 	if errors.ErrorIs(err, jwt.ErrExpValidation) {
-		logger.LogError(errors.ErrTokenExpValidation.Error())
+		logger.LogError(errors.Errorf("proxy: %v", errors.ErrTokenExpValidation).Error())
+
 		return errors.ErrTokenExpValidation
 	}
 	if errors.ErrorIs(err, jwt.ErrHMACVerification) {
-		logger.LogError(errors.ErrTokenHMACValidation.Error())
+		logger.LogError(errors.Errorf("proxy: %v", errors.ErrTokenHMACValidation).Error())
+
 		return errors.ErrTokenHMACValidation
 	}
 
@@ -156,13 +162,14 @@ func checkAPIKEYSecretKeyFromRequest(req *http.Request, ph *ProxyHandler, engine
 	apikey, err := ph.Service.GetKEY(engine, key)
 	header := req.Header.Get("X-API-KEY") // pass to constants
 	if err != nil {
-		logger.LogError(errors.ErrGetkeyView.Error())
+		logger.LogError(errors.Errorf("proxy: %v", errors.ErrGetkeyView).Error())
+
 	}
 	if apikey == header {
-		logger.LogInfo("OK")
+		logger.LogInfo("proxy: check secret from request OK")
 		return nil
 	} else {
-		logger.LogInfo("Invalid apikey")
+		logger.LogError(errors.Errorf("proxy: Invalid API KEY").Error())
 		return errors.NewError("Invalid API KEY")
 	}
 }

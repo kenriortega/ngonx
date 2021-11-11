@@ -96,7 +96,7 @@ func (s *ServerPool) HealthCheck() {
 		if !alive {
 			status = "down"
 		}
-		logger.LogInfo(fmt.Sprintf("%s [%s]\n", b.URL, status))
+		logger.LogInfo(fmt.Sprintf("lb: %s [%s]\n", b.URL, status))
 	}
 }
 
@@ -105,7 +105,7 @@ func isBackendAlive(u *url.URL) bool {
 	timeout := 2 * time.Second
 	conn, err := net.DialTimeout("tcp", u.Host, timeout)
 	if err != nil {
-		logger.LogError(errors.ErrIsBackendAlive.Error())
+		logger.LogError(errors.Errorf("lb: %v", errors.ErrIsBackendAlive).Error())
 		return false
 	}
 	_ = conn.Close()
