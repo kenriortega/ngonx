@@ -1,10 +1,19 @@
 package logger
 
 import (
+	"os"
+
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
 )
+
+func GetEnv(key, fallback string) string {
+	if value, ok := os.LookupEnv(key); ok {
+		return value
+	}
+	return fallback
+}
 
 var log *zap.Logger
 
@@ -19,7 +28,7 @@ func init() {
 	config.EncoderConfig = encoderConfig
 
 	w := zapcore.AddSync(&lumberjack.Logger{
-		Filename:   "./ngonx-log/ngonx.log",
+		Filename:   GetEnv(os.Getenv("NGONX_LOGS"), "./ngonx-log/ngonx.log"),
 		MaxSize:    500, // megabytes
 		MaxBackups: 3,
 		MaxAge:     28, // days
