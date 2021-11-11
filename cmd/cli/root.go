@@ -13,6 +13,7 @@ import (
 	handlers "github.com/kenriortega/ngonx/internal/mngt/handlers"
 	services "github.com/kenriortega/ngonx/internal/mngt/services"
 	"github.com/kenriortega/ngonx/pkg/config"
+	"github.com/kenriortega/ngonx/pkg/errors"
 	"github.com/kenriortega/ngonx/pkg/healthcheck"
 	"github.com/kenriortega/ngonx/pkg/httpsrv"
 	"github.com/kenriortega/ngonx/pkg/logger"
@@ -70,7 +71,7 @@ func initConfig() {
 	configFromYaml, errConfig = config.LoadConfig(cfgPath, cfgFile)
 
 	if errConfig != nil {
-		logger.LogError("Yaml file not found please run command setup " + errConfig.Error())
+		logger.LogError(errors.Errorf("ngonx: Yaml file not found please run command setup :%v", errConfig).Error())
 	}
 	go StartMngt(configFromYaml)
 
@@ -80,7 +81,7 @@ func StartMngt(config config.Config) {
 
 	stripped, err := fs.Sub(frontend, "ui")
 	if err != nil {
-		logger.LogError(err.Error())
+		logger.LogError(errors.Errorf("ngonx: :%v", err).Error())
 	}
 
 	frontendFS := http.FileServer(http.FS(stripped))
@@ -125,12 +126,12 @@ func StartMngt(config config.Config) {
 
 			endpoints, err := service.ListEndpoints()
 			if err != nil {
-				logger.LogError(err.Error())
+				logger.LogError(errors.Errorf("ngonx: :%v", err).Error())
 			}
 			for _, it := range endpoints {
 				u, err := url.Parse(it.PathUrl)
 				if err != nil {
-					logger.LogError(err.Error())
+					logger.LogError(errors.Errorf("ngonx: :%v", err).Error())
 				}
 				status := healthcheck.IsBackendAlive(u)
 				if status {
