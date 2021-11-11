@@ -52,26 +52,6 @@ func (r ProxyRepositoryStorage) SaveKEY(engine, key, apikey string) error {
 		if _, err := r.clientRdb.HSet(context.TODO(), key, apikey).Result(); err != nil {
 			logger.LogError(errors.Errorf("proxy redis: %v", err).Error())
 		}
-		// r.clientRdb.Expire(context.TODO(), key, 24*time.Hour)
-		// case "local":
-		// 	f, err := os.Create("./apikey")
-
-		// 	if err != nil {
-		// 		logger.LogError(errors.ErrSavekeyCreateLocal.Error())
-		// 		return errors.ErrSavekeyCreateLocal
-		// 	}
-
-		// 	// defer f.Close()
-
-		// 	data := []byte(fmt.Sprintf("%s:%s", key, apikey))
-
-		// 	_, err = f.Write(data)
-
-		// 	if err != nil {
-		// 		logger.LogError(errors.ErrSavekeyWriteOnLocal.Error())
-		// 		return errors.ErrSavekeyWriteOnLocal
-		// 	}
-		// 	return nil
 	}
 	return nil
 }
