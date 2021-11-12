@@ -9,7 +9,6 @@ import (
 	"github.com/kenriortega/ngonx/pkg/genkey"
 	"github.com/kenriortega/ngonx/pkg/httpsrv"
 	"github.com/kenriortega/ngonx/pkg/logger"
-	"github.com/kenriortega/ngonx/pkg/metric"
 	"github.com/spf13/cobra"
 )
 
@@ -29,8 +28,7 @@ var proxyCmd = &cobra.Command{
 		if err != nil {
 			logger.LogError(errors.Errorf("proxy: %v", err).Error())
 		}
-		// Exporter Metrics
-		go metric.ExposeMetricServer(configFromYaml.ProxyGateway.PortExporterProxy)
+
 		// proxy logic
 		engine := configFromYaml.ProxyCache.Engine
 		securityType := configFromYaml.ProxySecurity.Type

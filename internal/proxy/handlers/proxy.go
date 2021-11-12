@@ -10,8 +10,6 @@ import (
 
 	"github.com/kenriortega/ngonx/pkg/errors"
 	"github.com/kenriortega/ngonx/pkg/logger"
-	"github.com/kenriortega/ngonx/pkg/metric"
-	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/gbrlsnchs/jwt/v3"
 	domain "github.com/kenriortega/ngonx/internal/proxy/domain"
@@ -63,7 +61,6 @@ func (ph *ProxyHandler) ProxyGateway(endpoints domain.ProxyEndpoint, engine, key
 			originalDirector := proxy.Director
 			proxy.Director = func(req *http.Request) {
 				originalDirector(req)
-				metricRegister(req, target)
 
 				switch securityType {
 				case "jwt":
@@ -93,7 +90,6 @@ func (ph *ProxyHandler) ProxyGateway(endpoints domain.ProxyEndpoint, engine, key
 			originalDirector := proxy.Director
 			proxy.Director = func(req *http.Request) {
 				originalDirector(req)
-				metricRegister(req, target)
 
 			}
 			http.Handle(
@@ -105,24 +101,6 @@ func (ph *ProxyHandler) ProxyGateway(endpoints domain.ProxyEndpoint, engine, key
 			)
 		}
 	}
-}
-
-func metricRegister(req *http.Request, target *url.URL) {
-	metric.CountersByEndpoint.With(
-		prometheus.Labels{
-			"proxyPath":    req.RequestURI,
-			"endpointPath": target.String(),
-			"ipAddr":       extractIpAddr(req),
-			"method":       req.Method,
-		},
-	).Inc()
-	metric.TotalRequests.With(
-		prometheus.Labels{
-			"path":    req.RequestURI,
-			"service": "proxy",
-		},
-	).Inc()
-
 }
 
 // checkJWTSecretKeyFromRequest check jwt for request
