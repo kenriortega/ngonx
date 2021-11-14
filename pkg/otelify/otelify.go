@@ -4,8 +4,6 @@ import (
 	"context"
 	"log"
 
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promauto"
 	"google.golang.org/grpc"
 
 	"go.opentelemetry.io/otel"
@@ -16,13 +14,6 @@ import (
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.7.0"
 )
-
-var MetricRequestLatencyProxy = promauto.NewHistogram(prometheus.HistogramOpts{
-	Namespace: "ngonx",
-	Name:      "request_latency_seconds",
-	Help:      "Request Latency",
-	Buckets:   prometheus.ExponentialBuckets(.0001, 2, 50),
-})
 
 // Initializes an OTLP exporter, and configures the corresponding trace and
 // metric providers.
