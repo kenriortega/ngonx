@@ -1,6 +1,8 @@
 package proxy
 
 import (
+	"context"
+
 	domain "github.com/kenriortega/ngonx/internal/proxy/domain"
 	"github.com/kenriortega/ngonx/pkg/badgerdb"
 
@@ -10,7 +12,7 @@ import (
 var proxyRepository domain.ProxyRepository
 
 func Test_SaveSecretKEY(t *testing.T) {
-	clientBadger := badgerdb.GetBadgerDB(false)
+	clientBadger := badgerdb.GetBadgerDB(context.Background(), false)
 	proxyRepository = domain.NewProxyRepository(clientBadger)
 	err := proxyRepository.SaveKEY("badger", "key", "apikey")
 	if err != nil {
@@ -19,7 +21,7 @@ func Test_SaveSecretKEY(t *testing.T) {
 }
 
 func Test_GetKEY(t *testing.T) {
-	clientBadger := badgerdb.GetBadgerDB(false)
+	clientBadger := badgerdb.GetBadgerDB(context.Background(), false)
 	proxyRepository = domain.NewProxyRepository(clientBadger)
 	result, err := proxyRepository.GetKEY("badger", "key")
 	if err != nil {
