@@ -11,8 +11,10 @@ import (
 
 	"github.com/kenriortega/ngonx/pkg/errors"
 	"github.com/kenriortega/ngonx/pkg/logger"
+	"github.com/kenriortega/ngonx/pkg/otelify"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 
 	"github.com/gbrlsnchs/jwt/v3"
 	domain "github.com/kenriortega/ngonx/internal/proxy/domain"
@@ -56,6 +58,7 @@ func (ph *ProxyHandler) ProxyGateway(
 ) {
 	ctx, span := otel.Tracer("proxy.gateway").Start(context.Background(), "ProxyGateway")
 	defer span.End()
+	traceID := trace.SpanContextFromContext(ctx).TraceID().String()
 	for _, endpoint := range endpoints.Endpoints {
 		start := time.Now()
 
@@ -81,8 +84,7 @@ func (ph *ProxyHandler) ProxyGateway(
 				case "apikey":
 					err = checkAPIKEY(ctx, req, ph, engine, key)
 				}
-				otelRegister(ctx, start, req, err)
-
+				otelRegisterByRequest(ctx, start, req, err)
 			}
 			proxy.ModifyResponse = func(resp *http.Response) error {
 				resp.Header.Set("X-Proxy", "Ngonx")
@@ -118,9 +120,8 @@ func (ph *ProxyHandler) ProxyGateway(
 
 			originalDirector := proxy.Director
 			proxy.Director = func(req *http.Request) {
-				// log the trace id with other fields so we can discover traces through logs
 				originalDirector(req)
-				otelRegister(ctx, start, req, nil)
+				otelRegisterByRequest(ctx, start, req, nil)
 			}
 			proxy.ModifyResponse = func(resp *http.Response) error {
 				resp.Header.Set("X-Proxy", "Ngonx")
@@ -136,5 +137,5 @@ func (ph *ProxyHandler) ProxyGateway(
 			)
 		}
 	}
-	span.AddEvent("ProxyGateway done!")
+	otelify.InstrumentedInfo(span, "proxy.Gateway", traceID)
 }

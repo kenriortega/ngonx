@@ -12,12 +12,11 @@ import (
 	"github.com/kenriortega/ngonx/pkg/otelify"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 )
 
-func otelRegister(ctx context.Context, start time.Time, req *http.Request, err error) {
+func otelRegisterByRequest(ctx context.Context, start time.Time, req *http.Request, err error) {
 
 	traceID := trace.SpanContextFromContext(ctx).TraceID().String()
 
@@ -32,6 +31,7 @@ func otelRegister(ctx context.Context, start time.Time, req *http.Request, err e
 			zap.String("path", req.URL.Path),
 			zap.Duration("latency", time.Since(start)),
 		)
+
 		return
 	}
 	logger.LogInfo(
@@ -44,16 +44,15 @@ func otelRegister(ctx context.Context, start time.Time, req *http.Request, err e
 
 // checkJWT check jwt for request
 func checkJWT(ctx context.Context, req *http.Request, key string) error {
-	_, span := otel.Tracer("proxy.gateway.checkJWT").Start(ctx, "checkJWT")
+	ctx, span := otel.Tracer("proxy.gateway.checkJWT").Start(ctx, "checkJWT")
 	defer span.End()
+	traceID := trace.SpanContextFromContext(ctx).TraceID().String()
+
 	header := req.Header.Get("Authorization") // pass to constanst
 	hs := jwt.NewHS256([]byte(key))
 	now := time.Now()
 	if !strings.HasPrefix(header, "Bearer ") {
-		span.RecordError(errors.ErrBearerTokenFormat)
-		span.SetStatus(codes.Error, errors.ErrBearerTokenFormat.Error())
-		logger.LogError(errors.Errorf("proxy: %v", errors.ErrBearerTokenFormat).Error())
-
+		otelify.InstrumentedError(span, "checkJWT.bearer", traceID, errors.ErrBearerTokenFormat)
 		return errors.ErrBearerTokenFormat
 	}
 
@@ -65,20 +64,14 @@ func checkJWT(ctx context.Context, req *http.Request, key string) error {
 	_, err := jwt.Verify([]byte(token), hs, &pl, validatePayload)
 
 	if errors.ErrorIs(err, jwt.ErrExpValidation) {
-		span.RecordError(errors.ErrTokenExpValidation)
-		span.SetStatus(codes.Error, errors.ErrTokenExpValidation.Error())
-		logger.LogError(errors.Errorf("proxy: %v", errors.ErrTokenExpValidation).Error())
-
+		otelify.InstrumentedError(span, "checkJWT.expValidation", traceID, errors.ErrTokenExpValidation)
 		return errors.ErrTokenExpValidation
 	}
 	if errors.ErrorIs(err, jwt.ErrHMACVerification) {
-		span.RecordError(errors.ErrTokenHMACValidation)
-		span.SetStatus(codes.Error, errors.ErrTokenHMACValidation.Error())
-		logger.LogError(errors.Errorf("proxy: %v", errors.ErrTokenHMACValidation).Error())
-
+		otelify.InstrumentedError(span, "checkJWT.HMACValidation", traceID, errors.ErrTokenHMACValidation)
 		return errors.ErrTokenHMACValidation
 	}
-	span.AddEvent("checkJWT done!")
+	otelify.InstrumentedInfo(span, "checkJWT", traceID)
 	return nil
 }
 
@@ -89,25 +82,22 @@ func checkAPIKEY(
 	ph *ProxyHandler,
 	engine, key string,
 ) error {
-	_, span := otel.Tracer("proxy.gateway.checkAPIKey").Start(ctx, "checkAPIKEY")
+	ctx, span := otel.Tracer("proxy.gateway.checkAPIKey").Start(ctx, "checkAPIKEY")
 	defer span.End()
-	apikey, err := ph.Service.GetKEY(engine, key)
-	header := req.Header.Get("X-API-KEY")
-	if err != nil {
-		span.RecordError(errors.ErrGetkeyView)
-		span.SetStatus(codes.Error, errors.ErrGetkeyView.Error())
-		logger.LogError(errors.Errorf("proxy: %v", errors.ErrGetkeyView).Error())
+	traceID := trace.SpanContextFromContext(ctx).TraceID().String()
 
+	header := req.Header.Get("X-API-KEY")
+	apikey, err := ph.Service.GetKEY(engine, key)
+	if err != nil {
+		otelify.InstrumentedError(span, "checkAPIKEY.GetKEY", traceID, errors.ErrGetkeyView)
+		return errors.ErrGetkeyView
 	}
 	if apikey == header {
-		logger.LogInfo("proxy: check secret from request OK")
+		otelify.InstrumentedInfo(span, "checkAPIKEY", traceID)
 		return nil
 	} else {
 		invalidKeyErr := errors.NewError("Invalid API KEY")
-		span.RecordError(invalidKeyErr)
-		span.SetStatus(codes.Error, invalidKeyErr.Error())
-		logger.LogError(invalidKeyErr.Error())
+		otelify.InstrumentedError(span, "chackAPIKEY.invalidHeader", traceID, invalidKeyErr)
 		return invalidKeyErr
 	}
-
 }
