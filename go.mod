@@ -79,6 +79,7 @@ require (
 
 require (
 	github.com/felixge/httpsnoop v1.0.2 // indirect
+	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.2.0
 	go.opentelemetry.io/otel/internal/metric v0.24.0 // indirect
 	go.opentelemetry.io/otel/metric v0.24.0 // indirect
 )

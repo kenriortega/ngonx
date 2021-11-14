@@ -353,9 +353,6 @@ certbot renew
 
 ---
 
-
-> Yaml file fields
-
 BenchMarking
 ------------
 
