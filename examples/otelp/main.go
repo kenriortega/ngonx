@@ -71,6 +71,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// #nosec
 func shouldExecute(percent int) bool {
 	return rand.Int()%100 < percent
 }

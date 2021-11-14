@@ -104,7 +104,10 @@ func (ph *ProxyHandler) ProxyGateway(
 				if err != nil {
 					logger.LogError(err.Error())
 				}
-				w.Write(bytes)
+				_, err = w.Write(bytes)
+				if err != nil {
+					logger.LogError(err.Error())
+				}
 
 			}
 			http.Handle(
