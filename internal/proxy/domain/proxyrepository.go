@@ -6,8 +6,9 @@ import (
 	badger "github.com/dgraph-io/badger/v3"
 	"github.com/go-redis/redis/v8"
 	"github.com/kenriortega/ngonx/pkg/errors"
-	"github.com/kenriortega/ngonx/pkg/logger"
+	"github.com/kenriortega/ngonx/pkg/otelify"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // ProxyRepositoryStorage struct repository storage
@@ -33,36 +34,38 @@ func NewProxyRepository(clients ...interface{}) ProxyRepositoryStorage {
 
 // SaveKEY save a key on the database
 func (r ProxyRepositoryStorage) SaveKEY(engine, key, apikey string) error {
-	_, span := otel.Tracer("proxy.repo").Start(context.Background(), "SaveKEY")
+	ctx, span := otel.Tracer("proxy.repo").Start(context.Background(), "SaveKEY")
 	defer span.End()
+	traceID := trace.SpanContextFromContext(ctx).TraceID().String()
 	switch engine {
 	case "badger":
 		if err := r.clientBadger.Update(func(txn *badger.Txn) error {
 			if err := txn.Set([]byte(key), []byte(apikey)); err != nil {
-				logger.LogError(errors.ErrSavekeyUpdateTX.Error())
+				otelify.InstrumentedError(span, "badger", traceID, err)
 				return errors.ErrSavekeyUpdateTX
 			}
-			logger.LogInfo("proxy: savekey was successful")
-
+			otelify.InstrumentedInfo(span, "repo.SaveKey", traceID)
 			return nil
 		}); err != nil {
-
+			otelify.InstrumentedError(span, "badger", traceID, err)
 			return errors.ErrSavekeyUpdate
 		}
 
 		return nil
 	case "redis":
 		if _, err := r.clientRdb.HSet(context.TODO(), key, apikey).Result(); err != nil {
-			logger.LogError(errors.Errorf("proxy redis: %v", err).Error())
+			otelify.InstrumentedError(span, "redis", traceID, err)
 		}
+		otelify.InstrumentedInfo(span, "repo.SaveKey", traceID)
 	}
 	return nil
 }
 
 // GetKEY get key from the database
 func (r ProxyRepositoryStorage) GetKEY(engine, key string) (string, error) {
-	_, span := otel.Tracer("proxy.repo").Start(context.Background(), "GetKEY")
+	ctx, span := otel.Tracer("proxy.repo").Start(context.Background(), "GetKEY")
 	defer span.End()
+	traceID := trace.SpanContextFromContext(ctx).TraceID().String()
 	var apikey string
 
 	switch engine {
@@ -70,26 +73,31 @@ func (r ProxyRepositoryStorage) GetKEY(engine, key string) (string, error) {
 		if err := r.clientBadger.View(func(txn *badger.Txn) error {
 			item, err := txn.Get([]byte(key))
 			if err != nil {
+				otelify.InstrumentedError(span, "badger", traceID, err)
 				return errors.ErrGetkeyTX
 			}
 			if err := item.Value(func(value []byte) error {
 				apikey = string(value)
 				return nil
 			}); err != nil {
+				otelify.InstrumentedError(span, "badger", traceID, err)
 				return errors.ErrGetkeyValue
 			}
 
 			return nil
 		}); err != nil {
+			otelify.InstrumentedError(span, "badger", traceID, err)
 			return "", errors.ErrGetkeyView
 		}
 	case "redis":
 		value, err := r.clientRdb.Get(context.TODO(), key).Result()
 		if err == redis.Nil || err != nil {
+			otelify.InstrumentedError(span, "redis", traceID, err)
 			return "", err
 		}
 		apikey = value
 	}
+	otelify.InstrumentedInfo(span, "repo.GetKey", traceID)
 
 	return apikey, nil
 }
