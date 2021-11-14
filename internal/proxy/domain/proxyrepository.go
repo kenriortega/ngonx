@@ -7,6 +7,7 @@ import (
 	"github.com/go-redis/redis/v8"
 	"github.com/kenriortega/ngonx/pkg/errors"
 	"github.com/kenriortega/ngonx/pkg/logger"
+	"go.opentelemetry.io/otel"
 )
 
 // ProxyRepositoryStorage struct repository storage
@@ -32,6 +33,8 @@ func NewProxyRepository(clients ...interface{}) ProxyRepositoryStorage {
 
 // SaveKEY save a key on the database
 func (r ProxyRepositoryStorage) SaveKEY(engine, key, apikey string) error {
+	_, span := otel.Tracer("proxy.repo").Start(context.Background(), "SaveKEY")
+	defer span.End()
 	switch engine {
 	case "badger":
 		if err := r.clientBadger.Update(func(txn *badger.Txn) error {
@@ -58,6 +61,8 @@ func (r ProxyRepositoryStorage) SaveKEY(engine, key, apikey string) error {
 
 // GetKEY get key from the database
 func (r ProxyRepositoryStorage) GetKEY(engine, key string) (string, error) {
+	_, span := otel.Tracer("proxy.repo").Start(context.Background(), "GetKEY")
+	defer span.End()
 	var apikey string
 
 	switch engine {

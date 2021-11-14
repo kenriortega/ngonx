@@ -1,15 +1,18 @@
 package proxy
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
-	"strings"
 	"time"
 
 	"github.com/kenriortega/ngonx/pkg/errors"
 	"github.com/kenriortega/ngonx/pkg/logger"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/codes"
 
 	"github.com/gbrlsnchs/jwt/v3"
 	domain "github.com/kenriortega/ngonx/internal/proxy/domain"
@@ -45,36 +48,62 @@ func (ph *ProxyHandler) SaveSecretKEY(engine, key, apikey string) {
 }
 
 // ProxyGateway handler for management all request
-func (ph *ProxyHandler) ProxyGateway(endpoints domain.ProxyEndpoint, engine, key, securityType string) {
+func (ph *ProxyHandler) ProxyGateway(
+	endpoints domain.ProxyEndpoint,
+	engine,
+	key,
+	securityType string,
+) {
+	ctx, span := otel.Tracer("proxy.gateway").Start(context.Background(), "ProxyGateway")
+	defer span.End()
 	for _, endpoint := range endpoints.Endpoints {
+		start := time.Now()
 
 		target, err := url.Parse(
 			fmt.Sprintf("%s%s", endpoints.HostURI, endpoint.PathEndpoint),
 		)
 		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
 			logger.LogError(errors.Errorf("proxy: %v", err).Error())
-
 		}
+
 		if endpoint.PathProtected {
+			var err error
 			proxy = httputil.NewSingleHostReverseProxy(target)
 
 			originalDirector := proxy.Director
 			proxy.Director = func(req *http.Request) {
 				originalDirector(req)
-
 				switch securityType {
 				case "jwt":
-					err := checkJWTSecretKeyFromRequest(req, key)
-					proxy.ModifyResponse = modifyResponse(err)
+					err = checkJWT(ctx, req, key)
 				case "apikey":
-					err := checkAPIKEYSecretKeyFromRequest(req, ph, engine, key)
-					proxy.ModifyResponse = modifyResponse(err)
+					err = checkAPIKEY(ctx, req, ph, engine, key)
 				}
+				otelRegister(ctx, start, req, err)
 
 			}
-			proxy.ErrorHandler = func(rw http.ResponseWriter, r *http.Request, err error) {
-				rw.WriteHeader(http.StatusInternalServerError)
-				_, _ = rw.Write([]byte(err.Error()))
+			proxy.ModifyResponse = func(resp *http.Response) error {
+				resp.Header.Set("X-Proxy", "Ngonx")
+				if err != nil {
+					return err
+				}
+				return nil
+			}
+			proxy.ErrorHandler = func(w http.ResponseWriter, req *http.Request, err error) {
+				rpm := ResponseMiddleware{
+					Message: err.Error(),
+					Code:    http.StatusBadGateway,
+				}
+				w.WriteHeader(rpm.Code)
+				w.Header().Set("Content-Type", "application/json")
+				bytes, err := json.Marshal(&rpm)
+				if err != nil {
+					logger.LogError(err.Error())
+				}
+				w.Write(bytes)
+
 			}
 			http.Handle(
 				endpoint.PathToProxy,
@@ -89,9 +118,15 @@ func (ph *ProxyHandler) ProxyGateway(endpoints domain.ProxyEndpoint, engine, key
 
 			originalDirector := proxy.Director
 			proxy.Director = func(req *http.Request) {
+				// log the trace id with other fields so we can discover traces through logs
 				originalDirector(req)
-
+				otelRegister(ctx, start, req, nil)
 			}
+			proxy.ModifyResponse = func(resp *http.Response) error {
+				resp.Header.Set("X-Proxy", "Ngonx")
+				return nil
+			}
+
 			http.Handle(
 				endpoint.PathToProxy,
 				http.StripPrefix(
@@ -101,88 +136,5 @@ func (ph *ProxyHandler) ProxyGateway(endpoints domain.ProxyEndpoint, engine, key
 			)
 		}
 	}
-}
-
-// checkJWTSecretKeyFromRequest check jwt for request
-func checkJWTSecretKeyFromRequest(req *http.Request, key string) error {
-	header := req.Header.Get("Authorization") // pass to constanst
-	hs := jwt.NewHS256([]byte(key))
-	now := time.Now()
-	if !strings.HasPrefix(header, "Bearer ") {
-		logger.LogError(errors.Errorf("proxy: %v", errors.ErrBearerTokenFormat).Error())
-
-		return errors.ErrBearerTokenFormat
-	}
-
-	token := strings.Split(header, " ")[1]
-	pl := JWTPayload{}
-	expValidator := jwt.ExpirationTimeValidator(now)
-	validatePayload := jwt.ValidatePayload(&pl.Payload, expValidator)
-
-	_, err := jwt.Verify([]byte(token), hs, &pl, validatePayload)
-
-	if errors.ErrorIs(err, jwt.ErrExpValidation) {
-		logger.LogError(errors.Errorf("proxy: %v", errors.ErrTokenExpValidation).Error())
-
-		return errors.ErrTokenExpValidation
-	}
-	if errors.ErrorIs(err, jwt.ErrHMACVerification) {
-		logger.LogError(errors.Errorf("proxy: %v", errors.ErrTokenHMACValidation).Error())
-
-		return errors.ErrTokenHMACValidation
-	}
-
-	return nil
-}
-
-// checkAPIKEYSecretKeyFromRequest check apikey from request
-func checkAPIKEYSecretKeyFromRequest(req *http.Request, ph *ProxyHandler, engine, key string) error {
-	apikey, err := ph.Service.GetKEY(engine, key)
-	header := req.Header.Get("X-API-KEY") // pass to constants
-	if err != nil {
-		logger.LogError(errors.Errorf("proxy: %v", errors.ErrGetkeyView).Error())
-
-	}
-	if apikey == header {
-		logger.LogInfo("proxy: check secret from request OK")
-		return nil
-	} else {
-		logger.LogError(errors.Errorf("proxy: Invalid API KEY").Error())
-		return errors.NewError("Invalid API KEY")
-	}
-}
-
-// modifyResponse modify response
-func modifyResponse(err error) func(*http.Response) error {
-	return func(resp *http.Response) error {
-		resp.Header.Set("X-Proxy", "Ngonx")
-
-		if err != nil {
-			return err
-		}
-		return nil
-	}
-}
-
-func extractIpAddr(req *http.Request) string {
-	ipAddress := req.RemoteAddr
-	fwdAddress := req.Header.Get("X-Forwarded-For") // capitalisation doesn't matter
-	if fwdAddress != "" {
-		// Got X-Forwarded-For
-		ipAddress = fwdAddress // If it's a single IP, then awesome!
-
-		// If we got an array... grab the first IP
-		ips := strings.Split(fwdAddress, ", ")
-		if len(ips) > 1 {
-			ipAddress = ips[0]
-		}
-	}
-	remoteAddrToParse := ""
-	if strings.Contains(ipAddress, "[::1]") {
-		remoteAddrToParse = strings.Replace(ipAddress, "[::1]", "localhost", -1)
-		ipAddress = strings.Split(remoteAddrToParse, ":")[0]
-	} else {
-		ipAddress = strings.Split(ipAddress, ":")[0]
-	}
-	return ipAddress
+	span.AddEvent("ProxyGateway done!")
 }
