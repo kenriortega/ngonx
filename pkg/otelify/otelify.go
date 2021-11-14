@@ -4,10 +4,15 @@ import (
 	"context"
 	"log"
 
+	"github.com/kenriortega/ngonx/pkg/errors"
+	"github.com/kenriortega/ngonx/pkg/logger"
+	"go.opentelemetry.io/otel/trace"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
@@ -64,4 +69,21 @@ func NewResource(name, version, namEnv string) *resource.Resource {
 		),
 	)
 	return r
+}
+
+func InstrumentedError(span trace.Span, source, traceID string, err error) {
+	span.RecordError(err)
+	span.SetStatus(codes.Error, err.Error())
+	logger.LogError(
+		errors.Errorf("%s: %v", source, err).Error(),
+		zap.String("traceID", traceID),
+	)
+}
+
+func InstrumentedInfo(span trace.Span, source, traceID string) {
+	logger.LogInfo(
+		source,
+		zap.String("traceID", traceID),
+	)
+	span.SetAttributes(attribute.String(source, "Success"))
 }

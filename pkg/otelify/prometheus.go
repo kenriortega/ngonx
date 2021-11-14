@@ -2,9 +2,9 @@ package otelify
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
+	"github.com/kenriortega/ngonx/pkg/logger"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -20,5 +20,5 @@ var MetricRequestLatencyProxy = promauto.NewHistogram(prometheus.HistogramOpts{
 func ExposeMetricServer(configPort int) {
 	http.Handle("/metrics", promhttp.Handler())
 	port := fmt.Sprintf(":%d", configPort)
-	log.Fatal(http.ListenAndServe(port, nil))
+	logger.LogError(http.ListenAndServe(port, nil).Error())
 }

@@ -4,13 +4,9 @@ import (
 	"context"
 
 	badger "github.com/dgraph-io/badger/v3"
-	"github.com/kenriortega/ngonx/pkg/errors"
-	"github.com/kenriortega/ngonx/pkg/logger"
+	"github.com/kenriortega/ngonx/pkg/otelify"
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
-	"go.uber.org/zap"
 )
 
 var pathDB = "./badger.data"
@@ -32,21 +28,12 @@ func GetBadgerDB(ctx context.Context, embedMem bool) *badger.DB {
 
 	db, err := badger.Open(opt)
 	if err != nil {
-		span.RecordError(err)
-		span.SetStatus(codes.Error, err.Error())
-		logger.LogError(
-			errors.Errorf("badger: %v", err).Error(),
-			zap.String("traceID", traceID),
-		)
-
+		otelify.InstrumentedError(span, "badger", traceID, err)
 		panic(err)
 	}
 	clientBadger = db
-	logger.LogInfo(
-		"proxy.GetBadgerDB",
-		zap.String("traceID", traceID),
-	)
-	// defer clientBadger.Close()
-	span.SetAttributes(attribute.String("badgerdb.create.client", "Success"))
+
+	otelify.InstrumentedInfo(span, "proxy.GetBadgerDB", traceID)
+
 	return clientBadger
 }
