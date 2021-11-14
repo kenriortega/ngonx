@@ -19,18 +19,22 @@ var proxyCmd = &cobra.Command{
 	Use:   "proxy",
 	Short: "Run ngonx as a reverse proxy",
 	Run: func(cmd *cobra.Command, args []string) {
-		tracing, err := cmd.Flags().GetBool("tracing")
+		enableMetric, err := cmd.Flags().GetBool(flagMetric)
 		if err != nil {
 			logger.LogError(errors.Errorf("proxy: %v", err).Error())
 		}
-		if tracing {
+		if enableMetric {
+			// TODO: pass from compile vars
 			flush := otelify.InitProvider(
-				"example",
+				"ngonx",
 				"v0.4.5",
-				"test",
+				"dev",
+				// TODO: pass from yml file object
 				"0.0.0.0:55680",
 			)
 			defer flush()
+			// Exporter Metrics
+			go otelify.ExposeMetricServer(configFromYaml.ProxyGateway.PortExporterProxy)
 		}
 
 		port, err := cmd.Flags().GetInt(flagPort)
@@ -105,7 +109,7 @@ var proxyCmd = &cobra.Command{
 func init() {
 	proxyCmd.Flags().Int(flagPort, 5000, "Port to serve to run proxy")
 	proxyCmd.Flags().Bool(flagGenApiKey, false, "Action for generate hash for protected routes")
-	proxyCmd.Flags().Bool("tracing", false, "Action for enable distribution tracing")
+	proxyCmd.Flags().Bool(flagMetric, false, "Action for enable metrics OTEL")
 	proxyCmd.Flags().String(flagPrevKey, "", "Action for save a previous hash for protected routes to validate JWT")
 	rootCmd.AddCommand(proxyCmd)
 
