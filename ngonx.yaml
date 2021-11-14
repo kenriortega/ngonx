@@ -38,7 +38,7 @@ proxy:
   # maps of microservices with routes
   services_proxy:
       - name: microA
-        host_uri: http://localhost:3001
+        host_uri: http://localhost:5000
         endpoints:
           - path_endpoints: /api/v1/health/
             path_proxy: /health/

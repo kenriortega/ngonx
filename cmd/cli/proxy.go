@@ -1,6 +1,8 @@
 package cli
 
 import (
+	"context"
+
 	domain "github.com/kenriortega/ngonx/internal/proxy/domain"
 	handlers "github.com/kenriortega/ngonx/internal/proxy/handlers"
 	services "github.com/kenriortega/ngonx/internal/proxy/services"
@@ -9,7 +11,7 @@ import (
 	"github.com/kenriortega/ngonx/pkg/genkey"
 	"github.com/kenriortega/ngonx/pkg/httpsrv"
 	"github.com/kenriortega/ngonx/pkg/logger"
-	"github.com/kenriortega/ngonx/pkg/metric"
+	"github.com/kenriortega/ngonx/pkg/otelify"
 	"github.com/spf13/cobra"
 )
 
@@ -17,6 +19,24 @@ var proxyCmd = &cobra.Command{
 	Use:   "proxy",
 	Short: "Run ngonx as a reverse proxy",
 	Run: func(cmd *cobra.Command, args []string) {
+		enableMetric, err := cmd.Flags().GetBool(flagMetric)
+		if err != nil {
+			logger.LogError(errors.Errorf("proxy: %v", err).Error())
+		}
+		if enableMetric {
+			// TODO: pass from compile vars
+			flush := otelify.InitProvider(
+				"ngonx",
+				"v0.4.5",
+				"dev",
+				// TODO: pass from yml file object
+				"0.0.0.0:55680",
+			)
+			defer flush()
+			// Exporter Metrics
+			go otelify.ExposeMetricServer(configFromYaml.ProxyGateway.PortExporterProxy)
+		}
+
 		port, err := cmd.Flags().GetInt(flagPort)
 		if err != nil {
 			logger.LogError(errors.Errorf("proxy: %v", err).Error())
@@ -29,15 +49,14 @@ var proxyCmd = &cobra.Command{
 		if err != nil {
 			logger.LogError(errors.Errorf("proxy: %v", err).Error())
 		}
-		// Exporter Metrics
-		go metric.ExposeMetricServer(configFromYaml.ProxyGateway.PortExporterProxy)
+
 		// proxy logic
 		engine := configFromYaml.ProxyCache.Engine
 		securityType := configFromYaml.ProxySecurity.Type
 		key := configFromYaml.ProxyCache.Key + "_" + securityType
 
 		var proxyRepository domain.ProxyRepository
-		clientBadger := badgerdb.GetBadgerDB(false)
+		clientBadger := badgerdb.GetBadgerDB(context.Background(), false)
 		proxyRepository = domain.NewProxyRepository(clientBadger)
 		h := handlers.ProxyHandler{
 			Service: services.NewProxyService(proxyRepository),
@@ -61,7 +80,6 @@ var proxyCmd = &cobra.Command{
 		}
 
 		for _, endpoints := range configFromYaml.ProxyGateway.EnpointsProxy {
-
 			h.ProxyGateway(endpoints, engine, key, securityType)
 		}
 
@@ -91,6 +109,7 @@ var proxyCmd = &cobra.Command{
 func init() {
 	proxyCmd.Flags().Int(flagPort, 5000, "Port to serve to run proxy")
 	proxyCmd.Flags().Bool(flagGenApiKey, false, "Action for generate hash for protected routes")
+	proxyCmd.Flags().Bool(flagMetric, false, "Action for enable metrics OTEL")
 	proxyCmd.Flags().String(flagPrevKey, "", "Action for save a previous hash for protected routes to validate JWT")
 	rootCmd.AddCommand(proxyCmd)
 

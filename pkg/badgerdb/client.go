@@ -1,16 +1,23 @@
 package badgerdb
 
 import (
+	"context"
+
 	badger "github.com/dgraph-io/badger/v3"
-	"github.com/kenriortega/ngonx/pkg/errors"
-	"github.com/kenriortega/ngonx/pkg/logger"
+	"github.com/kenriortega/ngonx/pkg/otelify"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/trace"
 )
 
 var pathDB = "./badger.data"
 
 // GetBadgerDB return `*badger.DB`
 // this client provide GET and SAVE methods
-func GetBadgerDB(embedMem bool) *badger.DB {
+func GetBadgerDB(ctx context.Context, embedMem bool) *badger.DB {
+	ctx, span := otel.Tracer("badger.client").Start(ctx, "GetBadgerDB")
+	defer span.End()
+	traceID := trace.SpanContextFromContext(ctx).TraceID().String()
+
 	var opt badger.Options
 	var clientBadger *badger.DB
 	if embedMem {
@@ -21,12 +28,12 @@ func GetBadgerDB(embedMem bool) *badger.DB {
 
 	db, err := badger.Open(opt)
 	if err != nil {
-		logger.LogError(errors.Errorf("badger: %v", err).Error())
-
+		otelify.InstrumentedError(span, "badger", traceID, err)
 		panic(err)
 	}
 	clientBadger = db
-	// defer clientBadger.Close()
+
+	otelify.InstrumentedInfo(span, "proxy.GetBadgerDB", traceID)
 
 	return clientBadger
 }
