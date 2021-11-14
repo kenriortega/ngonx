@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"math/rand"
 	"net/http"
 	"time"
@@ -39,7 +40,7 @@ func main() {
 	server := instrumentedServer(handler)
 
 	fmt.Println("listening...")
-	server.ListenAndServe()
+	log.Fatal(server.ListenAndServe())
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
