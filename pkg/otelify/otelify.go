@@ -29,15 +29,6 @@ var MetricRequestLatencyProxy = promauto.NewHistogram(prometheus.HistogramOpts{
 func InitProvider(name, version, namEnv, endpoint string) func() {
 	ctx := context.Background()
 
-	res, err := resource.New(ctx,
-		resource.WithAttributes(
-			semconv.ServiceNameKey.String(name),
-			semconv.ServiceVersionKey.String(version),
-			attribute.String("environment", namEnv),
-		),
-	)
-	handleErr(err, "failed to create resource")
-
 	// Set up a trace exporter
 	traceExporter, err := otlptracegrpc.New(ctx,
 		otlptracegrpc.WithInsecure(),
@@ -51,7 +42,7 @@ func InitProvider(name, version, namEnv, endpoint string) func() {
 	bsp := sdktrace.NewBatchSpanProcessor(traceExporter)
 	tracerProvider := sdktrace.NewTracerProvider(
 		sdktrace.WithSampler(sdktrace.AlwaysSample()),
-		sdktrace.WithResource(res),
+		sdktrace.WithResource(NewResource(name, version, namEnv)),
 		sdktrace.WithSpanProcessor(bsp),
 	)
 	otel.SetTracerProvider(tracerProvider)
@@ -68,4 +59,18 @@ func handleErr(err error, message string) {
 	if err != nil {
 		log.Fatalf("%s: %v", message, err)
 	}
+}
+
+// NewResource returns a resource describing this application.
+func NewResource(name, version, namEnv string) *resource.Resource {
+	r, _ := resource.Merge(
+		resource.Default(),
+		resource.NewWithAttributes(
+			semconv.SchemaURL,
+			semconv.ServiceNameKey.String(name),
+			semconv.ServiceVersionKey.String(version),
+			attribute.String("environment", namEnv),
+		),
+	)
+	return r
 }
